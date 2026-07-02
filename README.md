@@ -827,10 +827,10 @@
                     } else if (s.scores && s.scores.length > 0) {
                         divPlacar.innerHTML = `<div style="color:var(--live); font-size: 13px; font-weight: 900; margin-top: 8px; border-top: 1px dashed var(--borda); padding-top: 5px; text-align: center; animation: piscar 1.5s infinite;">🔴 AO VIVO: ${placarCasa} - ${placarFora}</div>`;
                     } else {
-                        divPlacar.innerHTML = `<div style="color:var(--amarelo); font-size: 11px; font-weight: bold; margin-top: 8px; border-top: 1px dashed var(--borda); padding-top: 5px; text-align: center;">⏳ Aguardando início do jogo</div>`;
+                        divPlacar.innerHTML = `<div style="color:var(--texto-secundario); font-size: 11px; font-weight: bold; margin-top: 8px; border-top: 1px dashed var(--borda); padding-top: 5px; text-align: center;">AGUARDANDO INÍCIO DE JOGO</div>`;
                     }
                 } else {
-                    divPlacar.innerHTML = `<div style="color:var(--texto-secundario); font-size: 11px; margin-top: 8px; border-top: 1px dashed var(--borda); padding-top: 5px; text-align: center;">⏳ Aguardando evento...</div>`;
+                    divPlacar.innerHTML = `<div style="color:var(--texto-secundario); font-size: 11px; margin-top: 8px; border-top: 1px dashed var(--borda); padding-top: 5px; text-align: center;">AGUARDANDO INÍCIO DO JOGO</div>`;
                 }
             });
 
