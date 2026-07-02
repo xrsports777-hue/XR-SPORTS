@@ -255,7 +255,7 @@
         // =======================================================================
 
         const _0xShieldKeys = [
-            atob("MzhiNTczYWU0YzNjYzEyZGNhZjljYTM2OTY3YjU3MDk="), // SUA NOVA CHAVE FOI ADICIONADA AQUI
+            atob("MzhiNTczYWU0YzNjYzEyZGNhZjljYTM2OTY3YjU3MDk="), 
             atob("MzViN2M4NDhhMDU2ZGYxOWY0ZTBkNThmN2E0ZjMyZjc="), 
             atob("NGQyNzg2MTQzODhiNDVlYzQ5M2I5YzI4NzhiNTJjODA="), 
             atob("MTY2N2JjNDA3MDk4NWUzMmQ0ZTljOTdjNTFjYjAyYjk=")  
@@ -264,7 +264,7 @@
         let indiceChave = 0;
         let API_KEY = _0xShieldKeys[indiceChave];
         const NUMERO_WHATSAPP = "5582993729095"; 
-        const COOLDOWN_MS = 300000; // ATUALIZADO: 5 minutos de espera entre atualizações no botão (Modo Ultra Economia)
+        const COOLDOWN_MS = 300000; 
 
         function permissaoParaChamarAPI() {
             const ultimoAcesso = localStorage.getItem('xrsports_firewall_timer');
@@ -362,7 +362,6 @@
                 } catch (erro) { await new Promise(r => setTimeout(r, 800)); }
             }
             
-            // MODO OFFLINE (Garante que nunca vai travar)
             try {
                 let dadosString = JSON.stringify(dados);
                 let base64 = btoa(encodeURIComponent(dadosString));
@@ -689,7 +688,6 @@
                     }
 
                     if(isSuccess) {
-                        // Limpa o historico antigo e salva o novo no lugar
                         let idx = historicoBilhetes.indexOf(blobIdOriginal);
                         if (idx > -1) {
                             historicoBilhetes[idx] = blobId;
@@ -709,7 +707,6 @@
                             try { navigator.clipboard.writeText(linkFinalValidado); } catch(e){}
                             document.getElementById('modal-blindagem-texto').innerHTML = "O sistema gerou um <strong style='color:var(--neon);'>NOVO LINK</strong> já validado!<br><br>Ele já foi <b>Copiado para o seu celular!</b><br>Mande pro cliente, pois o link antigo dele não vai mudar.";
                             
-                            // Botão que manda pra tela do bilhete validado
                             document.getElementById('btn-modal-blindagem').onclick = function() {
                                 window.location.href = linkFinalValidado;
                             };
@@ -828,7 +825,6 @@
 
             if(ligasBilhete.length > 0 && dados.s === 1) {
                 buscarPlacaresBilhete(ligasBilhete, dados.j);
-                // ATUALIZADO: Intervalo de 5 minutos (Modo Ultra Economia)
                 setInterval(() => buscarPlacaresBilhete(ligasBilhete, dados.j), 300000);
             }
         }
@@ -871,7 +867,6 @@
 
                 let temLive = dadosCache.jogos.some(j => j.isLive);
                 
-                // ATUALIZADO: Cache de 10 min ao vivo, 45 min pré-jogo (Modo Ultra Economia)
                 let limiteCache = temLive ? 10 : 45;
 
                 if (diffMinutos < limiteCache) {
@@ -913,6 +908,8 @@
                     jogosCarregados = []; let mapaScores = {};
                     if(Array.isArray(resScores)) { resScores.forEach(s => { mapaScores[s.id] = s; }); }
 
+                    let odd1X = 0, odd12 = 0, oddX2 = 0, oddDnbCasa = 0, oddDnbFora = 0, oddC_HT = 0, oddE_HT = 0, oddF_HT = 0, odd1X_HT = 0, odd12_HT = 0, oddX2_HT = 0;
+
                     resOdds.forEach(jogo => {
                         let horaDoJogo = new Date(jogo.commence_time); let dadosScore = mapaScores[jogo.id];
                         if ((dadosScore && dadosScore.completed) || horaDoJogo < horaLimiteSumir || !jogo.bookmakers || jogo.bookmakers.length === 0) return; 
@@ -922,7 +919,6 @@
                         
                         let placarCInt = 0, placarFInt = 0;
                         
-                        // --- FIX 1: O problema do placar vazio 0 x 0 ---
                         if(isLive) {
                             placarC = "0"; placarF = "0"; 
                             if(dadosScore && dadosScore.scores && dadosScore.scores.length > 0) {
@@ -940,9 +936,14 @@
                         let totalGols = placarCInt + placarFInt; 
                         let isBtts = placarCInt > 0 && placarFInt > 0;
 
-                        let oddC = 0, oddE = 0, oddF = 0, oddM15 = 0, oddN15 = 0, oddM25 = 0, oddN25 = 0, oddBttsSim = 0, oddBttsNao = 0;
-                        let oddCrtM25 = 0, oddCrtN25 = 0; 
-                        let oddM05_HT = 0, oddN05_HT = 0, oddM15_HT = 0, oddN15_HT = 0;
+                        let oddC = 0, oddE = 0, oddF = 0, oddM15 = 0, oddN15 = 0, oddM25 = 0, oddN25 = 0, oddBttsSim = 0, oddBttsNao = 0, oddBttsHTSim = 0, oddBttsHTNao = 0;
+                        let oddCrtM25 = 0, oddCrtN25 = 0, oddM05_HT = 0, oddN05_HT = 0, oddM15_HT = 0, oddN15_HT = 0;
+                        
+                        let oddC_M05 = 0, oddC_N05 = 0, oddC_M15 = 0, oddC_N15 = 0, oddC_M25 = 0, oddC_N25 = 0;
+                        let oddF_M05 = 0, oddF_N05 = 0, oddF_M15 = 0, oddF_N15 = 0, oddF_M25 = 0, oddF_N25 = 0;
+
+                        let oddVam_CS = 0, oddVam_ES = 0, oddVam_FS = 0, oddVam_CN = 0, oddVam_EN = 0, oddVam_FN = 0; 
+                        let oddVTG_CM25 = 0, oddVTG_EM25 = 0, oddVTG_FM25 = 0, oddVTG_CN25 = 0, oddVTG_EN25 = 0, oddVTG_FN25 = 0; 
 
                         jogo.bookmakers.forEach(bm => {
                             let mH2H = bm.markets.find(m => m.key === 'h2h');
@@ -955,7 +956,16 @@
                         });
 
                         if (oddM25 > 0 && oddM15 === 0) { let pM25 = 1 / oddM25; let pM15 = Math.min(0.95, pM25 * 1.35); oddM15 = (1 / pM15) * 0.92; oddN15 = (1 / (1-pM15)) * 0.92; }
+                        
                         if (oddM25 > 0) { let pBttsSim = Math.min(0.88, (1 / oddM25) * 1.05); oddBttsSim = (1 / pBttsSim) * 0.92; oddBttsNao = (1 / (1 - pBttsSim)) * 0.92; } else if (oddC > 0) { oddBttsSim = 1.85 * 0.92; oddBttsNao = 1.85 * 0.92; }
+                        
+                        // NEW BTTS HT
+                        if (oddBttsSim > 0) {
+                            let pBttsHT_Y = Math.min(0.35, (1 / oddBttsSim) * 0.35); // Probabilidade bem menor de ambas no 1T
+                            oddBttsHTSim = (1 / pBttsHT_Y) * 0.92;
+                            oddBttsHTNao = (1 / (1 - pBttsHT_Y)) * 0.92;
+                        }
+
                         if (oddM25 > 0) {
                             let pM25 = 1 / oddM25;
                             let pM05HT = Math.min(0.85, pM25 * 1.5);
@@ -969,12 +979,32 @@
                         let probM25Cartoes = 0.70 + (Math.random() * 0.1); 
                         oddCrtM25 = (1 / probM25Cartoes) * 0.92; oddCrtN25 = (1 / (1 - probM25Cartoes)) * 0.92;
 
+                        if(oddC > 0 && oddF > 0 && oddM25 > 0) {
+                            let pC = 1/oddC; let pF = 1/oddF; let pTot = pC + pF;
+                            let pesoC = pC/pTot; let pesoF = pF/pTot;
+                            
+                            let pC_M05 = Math.min(0.92, 0.40 + (pesoC * 0.5));
+                            let pC_M15 = Math.min(0.75, 0.15 + (pesoC * 0.4));
+                            let pC_M25 = Math.min(0.40, 0.05 + (pesoC * 0.25));
+                            
+                            let pF_M05 = Math.min(0.92, 0.40 + (pesoF * 0.5));
+                            let pF_M15 = Math.min(0.75, 0.15 + (pesoF * 0.4));
+                            let pF_M25 = Math.min(0.40, 0.05 + (pesoF * 0.25));
+
+                            oddC_M05 = (1/pC_M05)*0.92; oddC_N05 = (1/(1-pC_M05))*0.92;
+                            oddC_M15 = (1/pC_M15)*0.92; oddC_N15 = (1/(1-pC_M15))*0.92;
+                            oddC_M25 = (1/pC_M25)*0.92; oddC_N25 = (1/(1-pC_M25))*0.92;
+                            
+                            oddF_M05 = (1/pF_M05)*0.92; oddF_N05 = (1/(1-pF_M05))*0.92;
+                            oddF_M15 = (1/pF_M15)*0.92; oddF_N15 = (1/(1-pF_M15))*0.92;
+                            oddF_M25 = (1/pF_M25)*0.92; oddF_N25 = (1/(1-pF_M25))*0.92;
+                        }
+
                         if (isLive && minutosCorridos > 0 && minutosCorridos <= 100) {
                             let f = Math.max(0.02, (90 - minutosCorridos) / 90); 
                             let fUnder = Math.pow(f, 1.5); 
                             let fatorAumento = 1 + (1 - f) * 3;
 
-                            // --- FIX 2: O problema da odd que travava em 1.01 no empate (0x0) ---
                             if (placarCInt > placarFInt) { 
                                 oddC = 1.01 + (oddC - 1.01) * fUnder; 
                                 oddE = oddE * (fatorAumento * 0.8); 
@@ -997,39 +1027,111 @@
                             if (totalGols >= 2) { oddM15_HT = 0; oddN15_HT = 0; } else { oddN15_HT = 1.01 + (oddN15_HT - 1.01) * fUnder; oddM15_HT = oddM15_HT * fatorAumento; }
                             if (isBtts) { oddBttsSim = 0; oddBttsNao = 0; } else { oddBttsNao = 1.01 + (oddBttsNao - 1.01) * fUnder; oddBttsSim = oddBttsSim * fatorAumento; }
 
+                            // Desativa Ambas 1T apos o HT ou atualiza
+                            if (minutosCorridos > 45) {
+                                oddBttsHTSim = 0; oddBttsHTNao = 0;
+                            } else {
+                                let isBttsHT = placarCInt > 0 && placarFInt > 0;
+                                if (isBttsHT) { oddBttsHTSim = 0; oddBttsHTNao = 0; }
+                                else { oddBttsHTNao = 1.01 + (oddBttsHTNao - 1.01) * fUnder; oddBttsHTSim = oddBttsHTSim * fatorAumento; }
+                            }
+
                             let cartoesSimulados = Math.floor(minutosCorridos / 25);
                             if (cartoesSimulados >= 3) { oddCrtM25 = 0; oddCrtN25 = 0; } else { oddCrtN25 = 1.01 + (oddCrtN25 - 1.01) * fUnder; oddCrtM25 = oddCrtM25 * fatorAumento; }
+
+                            if (placarCInt >= 1) { oddC_M05 = 0; oddC_N05 = 0; } else { oddC_N05 = 1.01 + (oddC_N05 - 1.01) * fUnder; oddC_M05 *= fatorAumento; }
+                            if (placarCInt >= 2) { oddC_M15 = 0; oddC_N15 = 0; } else { oddC_N15 = 1.01 + (oddC_N15 - 1.01) * fUnder; oddC_M15 *= fatorAumento; }
+                            if (placarCInt >= 3) { oddC_M25 = 0; oddC_N25 = 0; } else { oddC_N25 = 1.01 + (oddC_N25 - 1.01) * fUnder; oddC_M25 *= fatorAumento; }
+                            
+                            if (placarFInt >= 1) { oddF_M05 = 0; oddF_N05 = 0; } else { oddF_N05 = 1.01 + (oddF_N05 - 1.01) * fUnder; oddF_M05 *= fatorAumento; }
+                            if (placarFInt >= 2) { oddF_M15 = 0; oddF_N15 = 0; } else { oddF_N15 = 1.01 + (oddF_N15 - 1.01) * fUnder; oddF_M15 *= fatorAumento; }
+                            if (placarFInt >= 3) { oddF_M25 = 0; oddF_N25 = 0; } else { oddF_N25 = 1.01 + (oddF_N25 - 1.01) * fUnder; oddF_M25 *= fatorAumento; }
                         } else if (isLive && minutosCorridos > 100) {
                             oddC=0; oddE=0; oddF=0; oddM15=0; oddN15=0; oddM25=0; oddN25=0; oddBttsSim=0; oddBttsNao=0; oddCrtM25=0; oddCrtN25=0;
-                            oddM05_HT=0; oddN05_HT=0; oddM15_HT=0; oddN15_HT=0;
+                            oddM05_HT=0; oddN05_HT=0; oddM15_HT=0; oddN15_HT=0; oddBttsHTSim=0; oddBttsHTNao=0;
+                            oddC_M05=0; oddC_N05=0; oddC_M15=0; oddC_N15=0; oddC_M25=0; oddC_N25=0;
+                            oddF_M05=0; oddF_N05=0; oddF_M15=0; oddF_N15=0; oddF_M25=0; oddF_N25=0;
+                            oddVam_CS=0; oddVam_ES=0; oddVam_FS=0; oddVam_CN=0; oddVam_EN=0; oddVam_FN=0;
+                            oddVTG_CM25=0; oddVTG_EM25=0; oddVTG_FM25=0; oddVTG_CN25=0; oddVTG_EN25=0; oddVTG_FN25=0;
                         }
 
-                        let odd1X = 0, odd12 = 0, oddX2 = 0, oddDnbCasa = 0, oddDnbFora = 0, oddC_HT = 0, oddE_HT = 0, oddF_HT = 0;
                         if(oddC > 0 && oddE > 0 && oddF > 0) {
                             let probC = 1 / oddC, probE = 1 / oddE, probF = 1 / oddF;
                             odd1X = (1 / (probC + probE)) * 0.92; odd12 = (1 / (probC + probF)) * 0.92; oddX2 = (1 / (probF + probE)) * 0.92;
                             oddDnbCasa = (1 / (probC / (probC + probF))) * 0.92; oddDnbFora = (1 / (probF / (probC + probF))) * 0.92;
-                            if(minutosCorridos < 45) { oddC_HT = oddC * 1.15; oddE_HT = oddE * 0.85; oddF_HT = oddF * 1.15; }
+                            if(minutosCorridos < 45) { 
+                                oddC_HT = oddC * 1.15; oddE_HT = oddE * 0.85; oddF_HT = oddF * 1.15; 
+                                let probC_HT = 1 / oddC_HT, probE_HT = 1 / oddE_HT, probF_HT = 1 / oddF_HT;
+                                odd1X_HT = (1 / (probC_HT + probE_HT)) * 0.92;
+                                odd12_HT = (1 / (probC_HT + probF_HT)) * 0.92;
+                                oddX2_HT = (1 / (probF_HT + probE_HT)) * 0.92;
+                            }
+
+                            if(oddBttsSim > 0 && oddBttsNao > 0) {
+                                let probBttsY = 1 / oddBttsSim, probBttsN = 1 / oddBttsNao;
+                                oddVam_CS = (1 / (probC * probBttsY)) * 0.88;
+                                oddVam_ES = (1 / (probE * probBttsY)) * 0.88;
+                                oddVam_FS = (1 / (probF * probBttsY)) * 0.88;
+                                
+                                oddVam_CN = (1 / (probC * probBttsN)) * 0.88;
+                                oddVam_EN = (1 / (probE * probBttsN)) * 0.88; 
+                                oddVam_FN = (1 / (probF * probBttsN)) * 0.88;
+                            }
+
+                            if(oddM25 > 0 && oddN25 > 0) {
+                                let probM25 = 1 / oddM25, probN25 = 1 / oddN25;
+                                oddVTG_CM25 = (1 / (probC * probM25)) * 0.88;
+                                oddVTG_EM25 = (1 / (probE * probM25)) * 0.88;
+                                oddVTG_FM25 = (1 / (probF * probM25)) * 0.88;
+                                
+                                oddVTG_CN25 = (1 / (probC * probN25)) * 0.88;
+                                oddVTG_EN25 = (1 / (probE * probN25)) * 0.88;
+                                oddVTG_FN25 = (1 / (probF * probN25)) * 0.88;
+                            }
                         }
 
                         const MARGEM_CASA = 0.85; 
                         const clampOdd = (val) => val > 0 ? Math.min(50.00, Math.max(1.01, val * MARGEM_CASA)) : 0;
 
                         odd1X = clampOdd(odd1X); odd12 = clampOdd(odd12); oddX2 = clampOdd(oddX2);
+                        odd1X_HT = clampOdd(odd1X_HT); odd12_HT = clampOdd(odd12_HT); oddX2_HT = clampOdd(oddX2_HT);
                         oddDnbCasa = clampOdd(oddDnbCasa); oddDnbFora = clampOdd(oddDnbFora);
                         oddC_HT = clampOdd(oddC_HT); oddE_HT = clampOdd(oddE_HT); oddF_HT = clampOdd(oddF_HT);
                         oddC = clampOdd(oddC); oddE = clampOdd(oddE); oddF = clampOdd(oddF);
                         oddM15 = clampOdd(oddM15); oddN15 = clampOdd(oddN15);
                         oddM25 = clampOdd(oddM25); oddN25 = clampOdd(oddN25);
-                        if (isLive && minutosCorridos > 45) { oddM05_HT = 0; oddN05_HT = 0; oddM15_HT = 0; oddN15_HT = 0; }
+                        if (isLive && minutosCorridos > 45) { oddM05_HT = 0; oddN05_HT = 0; oddM15_HT = 0; oddN15_HT = 0; oddBttsHTSim = 0; oddBttsHTNao = 0;}
                         oddM05_HT = clampOdd(oddM05_HT); oddN05_HT = clampOdd(oddN05_HT);
                         oddM15_HT = clampOdd(oddM15_HT); oddN15_HT = clampOdd(oddN15_HT);
                         oddBttsSim = clampOdd(oddBttsSim); oddBttsNao = clampOdd(oddBttsNao);
+                        oddBttsHTSim = clampOdd(oddBttsHTSim); oddBttsHTNao = clampOdd(oddBttsHTNao);
                         oddCrtM25 = clampOdd(oddCrtM25); oddCrtN25 = clampOdd(oddCrtN25);
+                        
+                        oddC_M05 = clampOdd(oddC_M05); oddC_N05 = clampOdd(oddC_N05);
+                        oddC_M15 = clampOdd(oddC_M15); oddC_N15 = clampOdd(oddC_N15);
+                        oddC_M25 = clampOdd(oddC_M25); oddC_N25 = clampOdd(oddC_N25);
+                        oddF_M05 = clampOdd(oddF_M05); oddF_N05 = clampOdd(oddF_N05);
+                        oddF_M15 = clampOdd(oddF_M15); oddF_N15 = clampOdd(oddF_N15);
+                        oddF_M25 = clampOdd(oddF_M25); oddF_N25 = clampOdd(oddF_N25);
+
+                        oddVam_CS = clampOdd(oddVam_CS); oddVam_ES = clampOdd(oddVam_ES); oddVam_FS = clampOdd(oddVam_FS);
+                        oddVam_CN = clampOdd(oddVam_CN); oddVam_EN = clampOdd(oddVam_EN); oddVam_FN = clampOdd(oddVam_FN);
+
+                        oddVTG_CM25 = clampOdd(oddVTG_CM25); oddVTG_EM25 = clampOdd(oddVTG_EM25); oddVTG_FM25 = clampOdd(oddVTG_FM25);
+                        oddVTG_CN25 = clampOdd(oddVTG_CN25); oddVTG_EN25 = clampOdd(oddVTG_EN25); oddVTG_FN25 = clampOdd(oddVTG_FN25);
 
                         if(oddC > 0 || oddM25 > 0) {
                             jogosCarregados.push({
-                                id: jogo.id, casa: jogo.home_team, fora: jogo.away_team, oddC, oddE, oddF, odd1X, odd12, oddX2, oddDnbCasa, oddDnbFora, oddBttsSim, oddBttsNao, oddM15, oddN15, oddM25, oddN25, oddC_HT, oddE_HT, oddF_HT, oddCrtM25, oddCrtN25, oddM05_HT, oddN05_HT, oddM15_HT, oddN15_HT, dataCrua: horaDoJogo, dataVisual: arrumarData(jogo.commence_time), isLive, isIntervalo, minutosCorridos, placarC, placarF
+                                id: jogo.id, casa: jogo.home_team, fora: jogo.away_team, 
+                                oddC, oddE, oddF, odd1X, odd12, oddX2, odd1X_HT, odd12_HT, oddX2_HT, oddDnbCasa, oddDnbFora, oddBttsSim, oddBttsNao, oddBttsHTSim, oddBttsHTNao,
+                                oddM15, oddN15, oddM25, oddN25, oddC_HT, oddE_HT, oddF_HT, oddCrtM25, oddCrtN25, 
+                                oddM05_HT, oddN05_HT, oddM15_HT, oddN15_HT,
+                                oddC_M05, oddC_N05, oddC_M15, oddC_N15, oddC_M25, oddC_N25,
+                                oddF_M05, oddF_N05, oddF_M15, oddF_N15, oddF_M25, oddF_N25,
+                                oddVam_CS, oddVam_ES, oddVam_FS, oddVam_CN, oddVam_EN, oddVam_FN,
+                                oddVTG_CM25, oddVTG_EM25, oddVTG_FM25, oddVTG_CN25, oddVTG_EN25, oddVTG_FN25,
+                                dataCrua: horaDoJogo, dataVisual: arrumarData(jogo.commence_time), 
+                                isLive, isIntervalo, minutosCorridos, placarC, placarF
                             });
                         }
                     });
@@ -1050,7 +1152,6 @@
                         painelAviso.innerHTML = `⚠️ Conexão perdida ou Limite API atingido.<br>Mostrando jogos em <b>Modo Sobrevivência</b> (Offline).`;
                         console.log("🛡️ BLINDAGEM ATIVADA: Carregando cache antigo por falha na rede.");
                     } else {
-                        // ATUALIZADO: Modo X9 Ativado - Vai dedurar o erro exato da API
                         painelAviso.innerHTML = `❌ ERRO REAL DA API: <b>${erro.message}</b><br>Verifique a chave ou bloqueadores de anúncio.`; 
                     }
                 }
@@ -1076,6 +1177,11 @@
                 let btnX2 = j.oddX2 > 0 ? `<div class="odd-btn" id="btn-${j.id}-X2" onclick="clicarNaOdd('${j.id}', '${j.casa} x ${j.fora}', '${j.fora} ou Emp', ${j.oddX2}, 'X2')"><span class="odd-lbl">Fora/Emp</span><span class="odd-val">${j.oddX2.toFixed(2)}</span></div>` : "";
                 let blocoDuchance = (btn1X || btn12 || btnX2) ? `<div class="mercado-titulo">Dupla Chance</div><div class="odds-linha">${btn1X}${btn12}${btnX2}</div>` : "";
 
+                let btn1XHT = j.odd1X_HT > 0 ? `<div class="odd-btn" id="btn-${j.id}-1XHT" onclick="clicarNaOdd('${j.id}', '${j.casa} x ${j.fora}', '${j.casa} ou Emp (1ºT)', ${j.odd1X_HT}, '1XHT')"><span class="odd-lbl">Casa/Emp</span><span class="odd-val">${j.odd1X_HT.toFixed(2)}</span></div>` : "";
+                let btn12HT = j.odd12_HT > 0 ? `<div class="odd-btn" id="btn-${j.id}-12HT" onclick="clicarNaOdd('${j.id}', '${j.casa} x ${j.fora}', 'Casa ou Fora (1ºT)', ${j.odd12_HT}, '12HT')"><span class="odd-lbl">Casa/Fora</span><span class="odd-val">${j.odd12_HT.toFixed(2)}</span></div>` : "";
+                let btnX2HT = j.oddX2_HT > 0 ? `<div class="odd-btn" id="btn-${j.id}-X2HT" onclick="clicarNaOdd('${j.id}', '${j.casa} x ${j.fora}', '${j.fora} ou Emp (1ºT)', ${j.oddX2_HT}, 'X2HT')"><span class="odd-lbl">Fora/Emp</span><span class="odd-val">${j.oddX2_HT.toFixed(2)}</span></div>` : "";
+                let blocoDuchanceHT = (btn1XHT || btn12HT || btnX2HT) ? `<div class="mercado-titulo">Dupla Chance - 1º Tempo</div><div class="odds-linha">${btn1XHT}${btn12HT}${btnX2HT}</div>` : "";
+
                 let btnDNBC = j.oddDnbCasa > 0 ? `<div class="odd-btn" id="btn-${j.id}-DNBC" onclick="clicarNaOdd('${j.id}', '${j.casa} x ${j.fora}', '${j.casa} (DNB)', ${j.oddDnbCasa}, 'DNBC')"><span class="odd-lbl">Casa</span><span class="odd-val">${j.oddDnbCasa.toFixed(2)}</span></div>` : "";
                 let btnDNBF = j.oddDnbFora > 0 ? `<div class="odd-btn" id="btn-${j.id}-DNBF" onclick="clicarNaOdd('${j.id}', '${j.casa} x ${j.fora}', '${j.fora} (DNB)', ${j.oddDnbFora}, 'DNBF')"><span class="odd-lbl">Fora</span><span class="odd-val">${j.oddDnbFora.toFixed(2)}</span></div>` : "";
                 let blocoDnb = (btnDNBC || btnDNBF) ? `<div class="mercado-titulo">Empate Anula</div><div class="odds-linha-dupla">${btnDNBC}${btnDNBF}</div>` : "";
@@ -1083,6 +1189,30 @@
                 let btnBttsY = j.oddBttsSim > 0 ? `<div class="odd-btn" id="btn-${j.id}-BTTSY" onclick="clicarNaOdd('${j.id}', '${j.casa} x ${j.fora}', 'Ambas - Sim', ${j.oddBttsSim}, 'BTTSY')"><span class="odd-lbl">Sim</span><span class="odd-val">${j.oddBttsSim.toFixed(2)}</span></div>` : "";
                 let btnBttsN = j.oddBttsNao > 0 ? `<div class="odd-btn" id="btn-${j.id}-BTTSN" onclick="clicarNaOdd('${j.id}', '${j.casa} x ${j.fora}', 'Ambas - Não', ${j.oddBttsNao}, 'BTTSN')"><span class="odd-lbl">Não</span><span class="odd-val">${j.oddBttsNao.toFixed(2)}</span></div>` : "";
                 let blocoBtts = (btnBttsY || btnBttsN) ? `<div class="mercado-titulo">Ambas Marcam</div><div class="odds-linha-dupla">${btnBttsY}${btnBttsN}</div>` : "";
+
+                let btnBttsHTY = j.oddBttsHTSim > 0 ? `<div class="odd-btn" id="btn-${j.id}-BTTSHTY" onclick="clicarNaOdd('${j.id}', '${j.casa} x ${j.fora}', 'Ambas (1ºT) - Sim', ${j.oddBttsHTSim}, 'BTTSHTY')"><span class="odd-lbl">Sim (1ºT)</span><span class="odd-val">${j.oddBttsHTSim.toFixed(2)}</span></div>` : "";
+                let btnBttsHTN = j.oddBttsHTNao > 0 ? `<div class="odd-btn" id="btn-${j.id}-BTTSHTN" onclick="clicarNaOdd('${j.id}', '${j.casa} x ${j.fora}', 'Ambas (1ºT) - Não', ${j.oddBttsHTNao}, 'BTTSHTN')"><span class="odd-lbl">Não (1ºT)</span><span class="odd-val">${j.oddBttsHTNao.toFixed(2)}</span></div>` : "";
+                let blocoBttsHT = (btnBttsHTY || btnBttsHTN) ? `<div class="mercado-titulo">Ambas Marcam - 1º Tempo</div><div class="odds-linha-dupla">${btnBttsHTY}${btnBttsHTN}</div>` : "";
+
+                let botoesVamSim = ((j.oddVam_CS > 0) ? `<div class="odd-btn" id="btn-${j.id}-VAMCS" onclick="clicarNaOdd('${j.id}', '${j.casa} x ${j.fora}', '${j.casa} / Sim', ${j.oddVam_CS}, 'VAMCS')"><span class="odd-lbl">Casa/Sim</span><span class="odd-val">${j.oddVam_CS.toFixed(2)}</span></div>` : "") +
+                                   ((j.oddVam_ES > 0) ? `<div class="odd-btn" id="btn-${j.id}-VAMES" onclick="clicarNaOdd('${j.id}', '${j.casa} x ${j.fora}', 'Empate/Sim', ${j.oddVam_ES}, 'VAMES')"><span class="odd-lbl">Emp/Sim</span><span class="odd-val">${j.oddVam_ES.toFixed(2)}</span></div>` : "") +
+                                   ((j.oddVam_FS > 0) ? `<div class="odd-btn" id="btn-${j.id}-VAMFS" onclick="clicarNaOdd('${j.id}', '${j.casa} x ${j.fora}', '${j.fora} / Sim', ${j.oddVam_FS}, 'VAMFS')"><span class="odd-lbl">Fora/Sim</span><span class="odd-val">${j.oddVam_FS.toFixed(2)}</span></div>` : "");
+
+                let botoesVamNao = ((j.oddVam_CN > 0) ? `<div class="odd-btn" id="btn-${j.id}-VAMCN" onclick="clicarNaOdd('${j.id}', '${j.casa} x ${j.fora}', '${j.casa} / Não', ${j.oddVam_CN}, 'VAMCN')"><span class="odd-lbl">Casa/Não</span><span class="odd-val">${j.oddVam_CN.toFixed(2)}</span></div>` : "") +
+                                   ((j.oddVam_EN > 0) ? `<div class="odd-btn" id="btn-${j.id}-VAMEN" onclick="clicarNaOdd('${j.id}', '${j.casa} x ${j.fora}', 'Empate/Não', ${j.oddVam_EN}, 'VAMEN')"><span class="odd-lbl">Emp/Não</span><span class="odd-val">${j.oddVam_EN.toFixed(2)}</span></div>` : "") +
+                                   ((j.oddVam_FN > 0) ? `<div class="odd-btn" id="btn-${j.id}-VAMFN" onclick="clicarNaOdd('${j.id}', '${j.casa} x ${j.fora}', '${j.fora} / Não', ${j.oddVam_FN}, 'VAMFN')"><span class="odd-lbl">Fora/Não</span><span class="odd-val">${j.oddVam_FN.toFixed(2)}</span></div>` : "");
+
+                let blocoVAM = (botoesVamSim || botoesVamNao) ? `<div class="mercado-titulo">Vencedor e Ambos Marcam</div><div class="odds-linha">${botoesVamSim}</div><div class="odds-linha" style="margin-top:8px;">${botoesVamNao}</div>` : "";
+
+                let botoesVTGM25 = ((j.oddVTG_CM25 > 0) ? `<div class="odd-btn" id="btn-${j.id}-VTGCM25" onclick="clicarNaOdd('${j.id}', '${j.casa} x ${j.fora}', '${j.casa} / +2.5', ${j.oddVTG_CM25}, 'VTGCM25')"><span class="odd-lbl">Casa/+2.5</span><span class="odd-val">${j.oddVTG_CM25.toFixed(2)}</span></div>` : "") +
+                                   ((j.oddVTG_EM25 > 0) ? `<div class="odd-btn" id="btn-${j.id}-VTGEM25" onclick="clicarNaOdd('${j.id}', '${j.casa} x ${j.fora}', 'Empate / +2.5', ${j.oddVTG_EM25}, 'VTGEM25')"><span class="odd-lbl">Emp/+2.5</span><span class="odd-val">${j.oddVTG_EM25.toFixed(2)}</span></div>` : "") +
+                                   ((j.oddVTG_FM25 > 0) ? `<div class="odd-btn" id="btn-${j.id}-VTGFM25" onclick="clicarNaOdd('${j.id}', '${j.casa} x ${j.fora}', '${j.fora} / +2.5', ${j.oddVTG_FM25}, 'VTGFM25')"><span class="odd-lbl">Fora/+2.5</span><span class="odd-val">${j.oddVTG_FM25.toFixed(2)}</span></div>` : "");
+
+                let botoesVTGN25 = ((j.oddVTG_CN25 > 0) ? `<div class="odd-btn" id="btn-${j.id}-VTGCN25" onclick="clicarNaOdd('${j.id}', '${j.casa} x ${j.fora}', '${j.casa} / -2.5', ${j.oddVTG_CN25}, 'VTGCN25')"><span class="odd-lbl">Casa/-2.5</span><span class="odd-val">${j.oddVTG_CN25.toFixed(2)}</span></div>` : "") +
+                                   ((j.oddVTG_EN25 > 0) ? `<div class="odd-btn" id="btn-${j.id}-VTGEN25" onclick="clicarNaOdd('${j.id}', '${j.casa} x ${j.fora}', 'Empate / -2.5', ${j.oddVTG_EN25}, 'VTGEN25')"><span class="odd-lbl">Emp/-2.5</span><span class="odd-val">${j.oddVTG_EN25.toFixed(2)}</span></div>` : "") +
+                                   ((j.oddVTG_FN25 > 0) ? `<div class="odd-btn" id="btn-${j.id}-VTGFN25" onclick="clicarNaOdd('${j.id}', '${j.casa} x ${j.fora}', '${j.fora} / -2.5', ${j.oddVTG_FN25}, 'VTGFN25')"><span class="odd-lbl">Fora/-2.5</span><span class="odd-val">${j.oddVTG_FN25.toFixed(2)}</span></div>` : "");
+
+                let blocoVTG = (botoesVTGM25 || botoesVTGN25) ? `<div class="mercado-titulo">Vencedor e Total de Gols (2.5)</div><div class="odds-linha">${botoesVTGM25}</div><div class="odds-linha" style="margin-top:8px;">${botoesVTGN25}</div>` : "";
 
                 let botoesGols = ((j.oddM15 > 0) ? `<div class="odd-btn" id="btn-${j.id}-M15" onclick="clicarNaOdd('${j.id}', '${j.casa} x ${j.fora}', '+ 1.5 Gols', ${j.oddM15}, 'M15')"><span class="odd-lbl">+ 1.5 Gols</span><span class="odd-val">${j.oddM15.toFixed(2)}</span></div>` : "") +
                                  ((j.oddN15 > 0) ? `<div class="odd-btn" id="btn-${j.id}-N15" onclick="clicarNaOdd('${j.id}', '${j.casa} x ${j.fora}', '- 1.5 Gols', ${j.oddN15}, 'N15')"><span class="odd-lbl">- 1.5 Gols</span><span class="odd-val">${j.oddN15.toFixed(2)}</span></div>` : "") +
@@ -1096,8 +1226,24 @@
                                    ((j.oddN15_HT > 0) ? `<div class="odd-btn" id="btn-${j.id}-N15HT" onclick="clicarNaOdd('${j.id}', '${j.casa} x ${j.fora}', '- 1.5 Gols (1ºT)', ${j.oddN15_HT}, 'N15HT')"><span class="odd-lbl">- 1.5 (1ºT)</span><span class="odd-val">${j.oddN15_HT.toFixed(2)}</span></div>` : "");
                 let blocoGolsHT = botoesGolsHT !== "" ? `<div class="mercado-titulo">Gols - 1º Tempo</div><div class="odds-linha-dupla">${botoesGolsHT}</div>` : "";
 
+                let botoesTgC = ((j.oddC_M05 > 0) ? `<div class="odd-btn" id="btn-${j.id}-TGCM05" onclick="clicarNaOdd('${j.id}', '${j.casa} x ${j.fora}', '${j.casa} (+0.5 Gols)', ${j.oddC_M05}, 'TGCM05')"><span class="odd-lbl">+ 0.5 Gols</span><span class="odd-val">${j.oddC_M05.toFixed(2)}</span></div>` : "") +
+                                ((j.oddC_N05 > 0) ? `<div class="odd-btn" id="btn-${j.id}-TGCN05" onclick="clicarNaOdd('${j.id}', '${j.casa} x ${j.fora}', '${j.casa} (-0.5 Gols)', ${j.oddC_N05}, 'TGCN05')"><span class="odd-lbl">- 0.5 Gols</span><span class="odd-val">${j.oddC_N05.toFixed(2)}</span></div>` : "") +
+                                ((j.oddC_M15 > 0) ? `<div class="odd-btn" id="btn-${j.id}-TGCM15" onclick="clicarNaOdd('${j.id}', '${j.casa} x ${j.fora}', '${j.casa} (+1.5 Gols)', ${j.oddC_M15}, 'TGCM15')"><span class="odd-lbl">+ 1.5 Gols</span><span class="odd-val">${j.oddC_M15.toFixed(2)}</span></div>` : "") +
+                                ((j.oddC_N15 > 0) ? `<div class="odd-btn" id="btn-${j.id}-TGCN15" onclick="clicarNaOdd('${j.id}', '${j.casa} x ${j.fora}', '${j.casa} (-1.5 Gols)', ${j.oddC_N15}, 'TGCN15')"><span class="odd-lbl">- 1.5 Gols</span><span class="odd-val">${j.oddC_N15.toFixed(2)}</span></div>` : "") +
+                                ((j.oddC_M25 > 0) ? `<div class="odd-btn" id="btn-${j.id}-TGCM25" onclick="clicarNaOdd('${j.id}', '${j.casa} x ${j.fora}', '${j.casa} (+2.5 Gols)', ${j.oddC_M25}, 'TGCM25')"><span class="odd-lbl">+ 2.5 Gols</span><span class="odd-val">${j.oddC_M25.toFixed(2)}</span></div>` : "") +
+                                ((j.oddC_N25 > 0) ? `<div class="odd-btn" id="btn-${j.id}-TGCN25" onclick="clicarNaOdd('${j.id}', '${j.casa} x ${j.fora}', '${j.casa} (-2.5 Gols)', ${j.oddC_N25}, 'TGCN25')"><span class="odd-lbl">- 2.5 Gols</span><span class="odd-val">${j.oddC_N25.toFixed(2)}</span></div>` : "");
+                let blocoTgCasa = botoesTgC !== "" ? `<div class="mercado-titulo">Gols da Casa (${j.casa})</div><div class="odds-linha-dupla">${botoesTgC}</div>` : "";
+
+                let botoesTgF = ((j.oddF_M05 > 0) ? `<div class="odd-btn" id="btn-${j.id}-TGFM05" onclick="clicarNaOdd('${j.id}', '${j.casa} x ${j.fora}', '${j.fora} (+0.5 Gols)', ${j.oddF_M05}, 'TGFM05')"><span class="odd-lbl">+ 0.5 Gols</span><span class="odd-val">${j.oddF_M05.toFixed(2)}</span></div>` : "") +
+                                ((j.oddF_N05 > 0) ? `<div class="odd-btn" id="btn-${j.id}-TGFN05" onclick="clicarNaOdd('${j.id}', '${j.casa} x ${j.fora}', '${j.fora} (-0.5 Gols)', ${j.oddF_N05}, 'TGFN05')"><span class="odd-lbl">- 0.5 Gols</span><span class="odd-val">${j.oddF_N05.toFixed(2)}</span></div>` : "") +
+                                ((j.oddF_M15 > 0) ? `<div class="odd-btn" id="btn-${j.id}-TGFM15" onclick="clicarNaOdd('${j.id}', '${j.casa} x ${j.fora}', '${j.fora} (+1.5 Gols)', ${j.oddF_M15}, 'TGFM15')"><span class="odd-lbl">+ 1.5 Gols</span><span class="odd-val">${j.oddF_M15.toFixed(2)}</span></div>` : "") +
+                                ((j.oddF_N15 > 0) ? `<div class="odd-btn" id="btn-${j.id}-TGFN15" onclick="clicarNaOdd('${j.id}', '${j.casa} x ${j.fora}', '${j.fora} (-1.5 Gols)', ${j.oddF_N15}, 'TGFN15')"><span class="odd-lbl">- 1.5 Gols</span><span class="odd-val">${j.oddF_N15.toFixed(2)}</span></div>` : "") +
+                                ((j.oddF_M25 > 0) ? `<div class="odd-btn" id="btn-${j.id}-TGFM25" onclick="clicarNaOdd('${j.id}', '${j.casa} x ${j.fora}', '${j.fora} (+2.5 Gols)', ${j.oddF_M25}, 'TGFM25')"><span class="odd-lbl">+ 2.5 Gols</span><span class="odd-val">${j.oddF_M25.toFixed(2)}</span></div>` : "") +
+                                ((j.oddF_N25 > 0) ? `<div class="odd-btn" id="btn-${j.id}-TGFN25" onclick="clicarNaOdd('${j.id}', '${j.casa} x ${j.fora}', '${j.fora} (-2.5 Gols)', ${j.oddF_N25}, 'TGFN25')"><span class="odd-lbl">- 2.5 Gols</span><span class="odd-val">${j.oddF_N25.toFixed(2)}</span></div>` : "");
+                let blocoTgFora = botoesTgF !== "" ? `<div class="mercado-titulo">Gols do Fora (${j.fora})</div><div class="odds-linha-dupla">${botoesTgF}</div>` : "";
+
                 let botoesCartoes = ((j.oddCrtM25 > 0) ? `<div class="odd-btn" id="btn-${j.id}-CM25" onclick="clicarNaOdd('${j.id}', '${j.casa} x ${j.fora}', '+ 2.5 Cartões', ${j.oddCrtM25}, 'CM25')"><span class="odd-lbl">+ 2.5</span><span class="odd-val">${j.oddCrtM25.toFixed(2)}</span></div>` : "") +
-                                    ((j.oddCrtN25 > 0) ? `<div class="odd-btn" id="btn-${j.id}-CN25" onclick="clicarNaOdd('${j.id}', '${j.casa} x ${j.fora}', '- 2.5 Cartões', ${j.oddCrtN25}, 'CN25')"><span class="odd-lbl">- 2.5</span><span class="odd-val">${j.oddCrtN25.toFixed(2)}</span></div>` : "");
+                                     ((j.oddCrtN25 > 0) ? `<div class="odd-btn" id="btn-${j.id}-CN25" onclick="clicarNaOdd('${j.id}', '${j.casa} x ${j.fora}', '- 2.5 Cartões', ${j.oddCrtN25}, 'CN25')"><span class="odd-lbl">- 2.5</span><span class="odd-val">${j.oddCrtN25.toFixed(2)}</span></div>` : "");
                 let blocoCartoes = botoesCartoes !== "" ? `<div class="mercado-titulo">Cartões Amarelos</div><div class="odds-linha-dupla">${botoesCartoes}</div>` : "";
 
                 let btn1HT = j.oddC_HT > 0 ? `<div class="odd-btn" id="btn-${j.id}-1HT" onclick="clicarNaOdd('${j.id}', '${j.casa} x ${j.fora}', '${j.casa} (1ºT)', ${j.oddC_HT}, '1HT')"><span class="odd-lbl">Casa</span><span class="odd-val">${j.oddC_HT.toFixed(2)}</span></div>` : "";
@@ -1105,7 +1251,7 @@
                 let btn2HT = j.oddF_HT > 0 ? `<div class="odd-btn" id="btn-${j.id}-2HT" onclick="clicarNaOdd('${j.id}', '${j.casa} x ${j.fora}', '${j.fora} (1ºT)', ${j.oddF_HT}, '2HT')"><span class="odd-lbl">Fora</span><span class="odd-val">${j.oddF_HT.toFixed(2)}</span></div>` : "";
                 let blocoHT = (btn1HT || btnXHT || btn2HT) ? `<div class="mercado-titulo">Vencedor - 1º Tempo</div><div class="odds-linha">${btn1HT}${btnXHT}${btn2HT}</div>` : "";
 
-                htmlHTML += `<div class="card-jogo"><div class="card-topo"><span class="liga-tag">${nomeLigaFoco}</span>${badgeDaHora}</div><div class="placar-box"><div class="time-box">${desenharEscudo(j.casa)}<span class="nome-time">${j.casa}</span></div>${centroPlacar}<div class="time-box visitante">${desenharEscudo(j.fora)}<span class="nome-time">${j.fora}</span></div></div>${bloco1X2}${blocoHT}${blocoDuchance}${blocoDnb}${blocoBtts}${blocoGolsHT}${blocoGols}${blocoCartoes}</div>`;
+                htmlHTML += `<div class="card-jogo"><div class="card-topo"><span class="liga-tag">${nomeLigaFoco}</span>${badgeDaHora}</div><div class="placar-box"><div class="time-box">${desenharEscudo(j.casa)}<span class="nome-time">${j.casa}</span></div>${centroPlacar}<div class="time-box visitante">${desenharEscudo(j.fora)}<span class="nome-time">${j.fora}</span></div></div>${bloco1X2}${blocoHT}${blocoDuchance}${blocoDuchanceHT}${blocoDnb}${blocoBtts}${blocoBttsHT}${blocoVAM}${blocoVTG}${blocoGolsHT}${blocoGols}${blocoTgCasa}${blocoTgFora}${blocoCartoes}</div>`;
             });
             document.getElementById('container-jogos').innerHTML = htmlHTML;
             carrinho.forEach(c => { let b = document.getElementById(`btn-${c.idJogo}-${c.tipoOpcao}`); if(b) b.classList.add('selecionado'); });
@@ -1117,15 +1263,12 @@
             if(!oddAposta || oddAposta === 0) return;
             let jogoAtual = jogosCarregados.find(j => j.id === idJogo);
             
-            // --- NOVO BLOQUEIO DE JOGOS AO VIVO ---
             if (jogoAtual && jogoAtual.isLive) {
                 if(navigator.vibrate) navigator.vibrate(200);
                 mostrarToast("⚠️ Mercado ao vivo está fechado!", "erro");
                 return;
             }
-            // --------------------------------------
 
-            // --- NOVO BLOQUEIO POR DATA CORRIGIDO (HOJE + 2 DIAS) ---
             if (jogoAtual) {
                 let hoje = new Date();
                 hoje.setHours(0, 0, 0, 0); 
@@ -1134,43 +1277,108 @@
                 dataLimite.setDate(hoje.getDate() + 2);
                 dataLimite.setHours(23, 59, 59, 999); 
                 
-                // FIX: Converte a 'dataCrua' de volta para um objeto de Data oficial.
-                // Isso impede que o cache transforme a data em texto e bugue a regra.
                 let dataDoJogo = new Date(jogoAtual.dataCrua);
 
-                // FIX: Usa o '.getTime()' para comparar o número exato de milissegundos. É à prova de falhas.
                 if (dataDoJogo.getTime() > dataLimite.getTime()) {
                     if(navigator.vibrate) navigator.vibrate(200);
                     mostrarToast("⚠️ Este jogo ainda não foi liberado para fazer aposta.", "erro");
-                    return; // Bloqueia a ação
+                    return;
                 }
             }
-            // ----------------------------------------------
 
             const gruposMercado = {
+                '1XHT': 'dcHT', '12HT': 'dcHT', 'X2HT': 'dcHT',
                 '1': 'pr', 'X': 'pr', '2': 'pr',
                 '1X': 'pr', '12': 'pr', 'X2': 'pr',
                 'DNBC': 'pr', 'DNBF': 'pr',
                 '1HT': 'pr', 'XHT': 'pr', '2HT': 'pr',
                 'BTTSY': 'bt', 'BTTSN': 'bt',
+                'BTTSHTY': 'btHT', 'BTTSHTN': 'btHT',
                 'M15': 'go', 'N15': 'go', 'M25': 'go', 'N25': 'go',
                 'M05HT': 'goHT', 'N05HT': 'goHT', 'M15HT': 'goHT', 'N15HT': 'goHT',
-                'CM25': 'ca', 'CN25': 'ca'
+                'CM25': 'ca', 'CN25': 'ca',
+                'TGCM05': 'tg', 'TGCN05': 'tg', 'TGCM15': 'tg', 'TGCN15': 'tg', 'TGCM25': 'tg', 'TGCN25': 'tg',
+                'TGFM05': 'tg', 'TGFN05': 'tg', 'TGFM15': 'tg', 'TGFN15': 'tg', 'TGFM25': 'tg', 'TGFN25': 'tg',
+                'VAMCS': 'vam', 'VAMES': 'vam', 'VAMFS': 'vam', 'VAMCN': 'vam', 'VAMEN': 'vam', 'VAMFN': 'vam',
+                'VTGCM25': 'vtg', 'VTGEM25': 'vtg', 'VTGFM25': 'vtg', 'VTGCN25': 'vtg', 'VTGEN25': 'vtg', 'VTGFN25': 'vtg'
             };
             
             let meuGrupo = gruposMercado[tipoOpcao]; 
             let selecoesNesteJogo = carrinho.filter(c => c.idJogo === idJogo); 
             let jaSelecionado = selecoesNesteJogo.find(c => c.tipoOpcao === tipoOpcao);
 
-            let isOpcHT = tipoOpcao.includes('HT') && !tipoOpcao.includes('05HT') && !tipoOpcao.includes('15HT');
-            let isOpcBTTS = tipoOpcao.includes('BTTS');
+            let isOpcHT = tipoOpcao.includes('HT') && !tipoOpcao.includes('05HT') && !tipoOpcao.includes('15HT') && !tipoOpcao.includes('BTTS') && !tipoOpcao.includes('XHT');
+            let isOpcBTTS = ['BTTSY', 'BTTSN'].includes(tipoOpcao);
             let isOpcDuplaChance = ['1X', '12', 'X2'].includes(tipoOpcao);
             
             let isOpcGols15 = ['M15', 'N15'].includes(tipoOpcao);
+            
+            let isOpcTG = tipoOpcao.startsWith('TGC') || tipoOpcao.startsWith('TGF');
+            let temTGNesteJogo = selecoesNesteJogo.some(c => c.tipoOpcao.startsWith('TGC') || c.tipoOpcao.startsWith('TGF'));
+            let outrasOpcoesNesteJogoTG = selecoesNesteJogo.filter(c => !(c.tipoOpcao.startsWith('TGC') || c.tipoOpcao.startsWith('TGF')));
+
+            let isOpcVAM = tipoOpcao.startsWith('VAM');
+            let temVAMNesteJogo = selecoesNesteJogo.some(c => c.tipoOpcao.startsWith('VAM'));
+            let outrasOpcoesNesteJogoVAM = selecoesNesteJogo.filter(c => !c.tipoOpcao.startsWith('VAM'));
+
+            let isOpcVTG = tipoOpcao.startsWith('VTG');
+            let temVTGNesteJogo = selecoesNesteJogo.some(c => c.tipoOpcao.startsWith('VTG'));
+            let outrasOpcoesNesteJogoVTG = selecoesNesteJogo.filter(c => !c.tipoOpcao.startsWith('VTG'));
+
+            // === REGRA: AMBAS MARCAM (1º TEMPO) ===
+            let isOpcBTTSHT = ['BTTSHTY', 'BTTSHTN'].includes(tipoOpcao);
+            let temBTTSHTNesteJogo = selecoesNesteJogo.some(c => ['BTTSHTY', 'BTTSHTN'].includes(c.tipoOpcao));
+            let outrasOpcoesNesteJogoBTTSHT = selecoesNesteJogo.filter(c => !['BTTSHTY', 'BTTSHTN'].includes(c.tipoOpcao));
 
             if (!jaSelecionado) {
-                let temHTNesteJogo = selecoesNesteJogo.some(c => c.tipoOpcao.includes('HT') && !c.tipoOpcao.includes('05HT') && !c.tipoOpcao.includes('15HT'));
-                let outrasOpcoesNesteJogoHT = selecoesNesteJogo.filter(c => !(c.tipoOpcao.includes('HT') && !c.tipoOpcao.includes('05HT') && !c.tipoOpcao.includes('15HT')));
+                if (isOpcBTTSHT && outrasOpcoesNesteJogoBTTSHT.length > 0) {
+                    if(navigator.vibrate) navigator.vibrate(200);
+                    mostrarToast("⚠️ Regra da Banca:<br>Ambas Marcam (1º Tempo) não pode ser combinada com outros mercados no mesmo jogo!", "erro");
+                    return;
+                }
+                if (!isOpcBTTSHT && temBTTSHTNesteJogo) {
+                    if(navigator.vibrate) navigator.vibrate(200);
+                    mostrarToast("⚠️ Regra da Banca:<br>Você já selecionou Ambas Marcam (1º Tempo) neste jogo. Ela não permite combinações extras!", "erro");
+                    return;
+                }
+
+                // === REGRA: VENCEDOR E TOTAL DE GOLS ===
+                if (isOpcVTG && outrasOpcoesNesteJogoVTG.length > 0) {
+                    if(navigator.vibrate) navigator.vibrate(200);
+                    mostrarToast("⚠️ Regra da Banca:<br>Vencedor / Total de Gols não pode ser combinado com outros mercados no mesmo jogo!", "erro");
+                    return;
+                }
+                if (!isOpcVTG && temVTGNesteJogo) {
+                    if(navigator.vibrate) navigator.vibrate(200);
+                    mostrarToast("⚠️ Regra da Banca:<br>Você já selecionou Vencedor / Total de Gols neste jogo. Ele não permite combinações extras!", "erro");
+                    return;
+                }
+
+                // === REGRA: VENCEDOR E AMBOS MARCAM ===
+                if (isOpcVAM && outrasOpcoesNesteJogoVAM.length > 0) {
+                    if(navigator.vibrate) navigator.vibrate(200);
+                    mostrarToast("⚠️ Regra da Banca:<br>Vencedor / Ambos Marcam não pode ser combinado com outros mercados no mesmo jogo!", "erro");
+                    return;
+                }
+                if (!isOpcVAM && temVAMNesteJogo) {
+                    if(navigator.vibrate) navigator.vibrate(200);
+                    mostrarToast("⚠️ Regra da Banca:<br>Você já selecionou Vencedor / Ambos Marcam neste jogo. Ele não permite combinações extras!", "erro");
+                    return;
+                }
+
+                if (isOpcTG && outrasOpcoesNesteJogoTG.length > 0) {
+                    if(navigator.vibrate) navigator.vibrate(200);
+                    mostrarToast("⚠️ Regra da Banca:<br>Gols por Equipe (Casa/Fora) não pode ser combinado com outros mercados no mesmo jogo!", "erro");
+                    return;
+                }
+                if (!isOpcTG && temTGNesteJogo) {
+                    if(navigator.vibrate) navigator.vibrate(200);
+                    mostrarToast("⚠️ Regra da Banca:<br>Você já selecionou Gols por Equipe neste jogo. Essa opção não permite combinações extras!", "erro");
+                    return;
+                }
+
+                let temHTNesteJogo = selecoesNesteJogo.some(c => c.tipoOpcao.includes('HT') && !c.tipoOpcao.includes('05HT') && !c.tipoOpcao.includes('15HT') && !c.tipoOpcao.includes('BTTS') && !c.tipoOpcao.includes('XHT'));
+                let outrasOpcoesNesteJogoHT = selecoesNesteJogo.filter(c => !(c.tipoOpcao.includes('HT') && !c.tipoOpcao.includes('05HT') && !c.tipoOpcao.includes('15HT') && !c.tipoOpcao.includes('BTTS') && !c.tipoOpcao.includes('XHT')));
 
                 if (isOpcHT && outrasOpcoesNesteJogoHT.length > 0) {
                     if(navigator.vibrate) navigator.vibrate(200);
@@ -1197,6 +1405,21 @@
                     return;
                 }
 
+                let isOpcDCHT = ['1XHT', '12HT', 'X2HT'].includes(tipoOpcao);
+                let temDCHTNesteJogo = selecoesNesteJogo.some(c => ['1XHT', '12HT', 'X2HT'].includes(c.tipoOpcao));
+                let outrasOpcoesNesteJogoDCHT = selecoesNesteJogo.filter(c => !['1XHT', '12HT', 'X2HT'].includes(c.tipoOpcao));
+
+                if (isOpcDCHT && outrasOpcoesNesteJogoDCHT.length > 0) {
+                    if(navigator.vibrate) navigator.vibrate(200);
+                    mostrarToast("⚠️ Regra da Banca:<br>Dupla Chance (1º Tempo) não pode ser combinada com outros mercados no mesmo jogo!", "erro");
+                    return;
+                }
+                if (!isOpcDCHT && temDCHTNesteJogo) {
+                    if(navigator.vibrate) navigator.vibrate(200);
+                    mostrarToast("⚠️ Regra da Banca:<br>Você já selecionou Dupla Chance (1º Tempo) neste jogo. Ela não permite combinações extras!", "erro");
+                    return;
+                }
+
                 let isOpcGolsHT = ['M05HT', 'N05HT', 'M15HT', 'N15HT'].includes(tipoOpcao);
                 let temGolsHTNesteJogo = selecoesNesteJogo.some(c => ['M05HT', 'N05HT', 'M15HT', 'N15HT'].includes(c.tipoOpcao));
                 let outrasOpcoesNesteJogoGolsHT = selecoesNesteJogo.filter(c => !['M05HT', 'N05HT', 'M15HT', 'N15HT'].includes(c.tipoOpcao));
@@ -1213,7 +1436,7 @@
                 }
 
                 let temGols15NesteJogo = selecoesNesteJogo.some(c => ['M15', 'N15'].includes(c.tipoOpcao));
-                let temAmbasNesteJogo = selecoesNesteJogo.some(c => c.tipoOpcao.includes('BTTS'));
+                let temAmbasNesteJogo = selecoesNesteJogo.some(c => ['BTTSY', 'BTTSN'].includes(c.tipoOpcao));
 
                 if ((isOpcBTTS && temGols15NesteJogo) || (isOpcGols15 && temAmbasNesteJogo)) {
                     if(navigator.vibrate) navigator.vibrate(200);
