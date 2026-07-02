@@ -84,7 +84,7 @@
                     <div class="logo-badge"><span>XR</span></div>
                     <div class="logo-typography">
                         <div class="logo-title"><strong>XR</strong> SPORTS</div>
-                        <div class="logo-subtitle">A Banca Premium (V3)</div>
+                        <div class="logo-subtitle">A Banca Premium</div>
                     </div>
                 </div>
                 <button class="btn-sync" id="btn-sync-geral" onclick="forcarAtualizacao()">🔄 Atualizar</button>
@@ -220,7 +220,7 @@
 
     <script>
         // =======================================================================
-        // 🧹 EXTERMINADOR DE CACHE: Garante que você veja a versão v3 imediatamente
+        // 🧹 EXTERMINADOR DE CACHE: Garante que você veja a versão imediatamente
         // =======================================================================
         try {
             Object.keys(localStorage).forEach(k => {
@@ -767,27 +767,76 @@
             }
         }
 
-        async function buscarPlacaresBilhete(ligas, jogosNoBilhete) {
+        async function buscarPlacaresBilhete(ligas, dadosBilhete, blobId) {
             let placaresMap = {};
+            let apiEsgotada = false;
+
+            const tentarBuscar = async (liga) => {
+                let req = await fetchBlindado(`https://api.the-odds-api.com/v4/sports/${liga}/scores/?apiKey=${API_KEY}&daysFrom=1`, 5000, 1);
+                
+                if (req.status === 401 || req.status === 429) {
+                    if (trocarChaveAPI()) return await tentarBuscar(liga);
+                    apiEsgotada = true;
+                    return null;
+                }
+                let res = await req.json();
+                if(res.message) {
+                    if (trocarChaveAPI()) return await tentarBuscar(liga);
+                    apiEsgotada = true;
+                    return null;
+                }
+                return res;
+            };
+
             for (let liga of ligas) {
+                if (apiEsgotada) break;
                 try {
-                    let req = await fetchBlindado(`https://api.the-odds-api.com/v4/sports/${liga}/scores/?apiKey=${API_KEY}`, 5000, 1);
-                    let res = await req.json();
+                    let res = await tentarBuscar(liga);
                     if(Array.isArray(res)) { res.forEach(s => { placaresMap[s.id] = s; }); }
                 } catch(e) {}
             }
 
-            jogosNoBilhete.forEach(jogo => {
-                let divPlacar = document.getElementById(`placar-bilhete-${jogo.idJogo}`);
-                if(divPlacar && placaresMap[jogo.idJogo]) {
+            let teveAlteracao = false;
+
+            dadosBilhete.j.forEach((jogo, index) => {
+                if (jogo.placarFinal) return; 
+
+                let divPlacar = document.getElementById(`placar-bilhete-${jogo.idJogo}-${index}`);
+                if (!divPlacar) return;
+
+                if (apiEsgotada) {
+                    divPlacar.innerHTML = `<div style="color:var(--texto-secundario); font-size: 11px; margin-top: 8px; border-top: 1px dashed var(--borda); padding-top: 5px; text-align: center;">⚠️ Limite de buscas esgotado. Atualize depois.</div>`;
+                    return;
+                }
+
+                if(placaresMap[jogo.idJogo]) {
                     let s = placaresMap[jogo.idJogo];
-                    if(s.completed) {
-                        divPlacar.innerHTML = `<div style="color:var(--texto-secundario); font-size: 12px; font-weight: bold; margin-top: 8px; border-top: 1px dashed var(--borda); padding-top: 5px; text-align: center;">🏁 FIM DE JOGO: ${s.scores && s.scores.length > 1 ? s.scores[0].score + ' - ' + s.scores[1].score : 'Encerrado'}</div>`;
-                    } else if (s.scores && s.scores.length > 0) {
-                        divPlacar.innerHTML = `<div style="color:var(--live); font-size: 13px; font-weight: 900; margin-top: 8px; border-top: 1px dashed var(--borda); padding-top: 5px; text-align: center; animation: piscar 1.5s infinite;">🔴 AO VIVO: ${s.scores[0].score} - ${s.scores[1].score}</div>`;
+                    
+                    let placarCasa = "0"; let placarFora = "0";
+                    if(s.scores && s.scores.length > 0) {
+                        let objCasa = s.scores.find(x => x.name === s.home_team);
+                        let objFora = s.scores.find(x => x.name === s.away_team);
+                        placarCasa = objCasa ? objCasa.score : s.scores[0].score;
+                        placarFora = objFora ? objFora.score : (s.scores[1] ? s.scores[1].score : "0");
                     }
+
+                    if(s.completed) {
+                        jogo.placarFinal = `🏁 FIM DE JOGO: ${placarCasa} - ${placarFora}`;
+                        teveAlteracao = true; 
+                        divPlacar.innerHTML = `<div style="color:var(--texto-secundario); font-size: 12px; font-weight: bold; margin-top: 8px; border-top: 1px dashed var(--borda); padding-top: 5px; text-align: center;">${jogo.placarFinal}</div>`;
+                    } else if (s.scores && s.scores.length > 0) {
+                        divPlacar.innerHTML = `<div style="color:var(--live); font-size: 13px; font-weight: 900; margin-top: 8px; border-top: 1px dashed var(--borda); padding-top: 5px; text-align: center; animation: piscar 1.5s infinite;">🔴 AO VIVO: ${placarCasa} - ${placarFora}</div>`;
+                    } else {
+                        divPlacar.innerHTML = `<div style="color:var(--amarelo); font-size: 11px; font-weight: bold; margin-top: 8px; border-top: 1px dashed var(--borda); padding-top: 5px; text-align: center;">⏳ Aguardando início do jogo</div>`;
+                    }
+                } else {
+                    divPlacar.innerHTML = `<div style="color:var(--texto-secundario); font-size: 11px; margin-top: 8px; border-top: 1px dashed var(--borda); padding-top: 5px; text-align: center;">⏳ Aguardando evento...</div>`;
                 }
             });
+
+            if (teveAlteracao && blobId && !blobId.startsWith("OFF-")) {
+                atualizarNaNuvem(blobId, dadosBilhete);
+            }
         }
 
         async function montarBilheteDigital(blobId) {
@@ -820,17 +869,24 @@
 
             let htmlJogos = "";
             let ligasBilhete = [];
+            let precisaBuscarAoVivo = false;
             
-            dados.j.forEach(jogo => { 
+            dados.j.forEach((jogo, index) => { 
                 if(jogo.liga && !ligasBilhete.includes(jogo.liga)) ligasBilhete.push(jogo.liga);
                 
+                let htmlPlacar = jogo.placarFinal 
+                    ? `<div style="color:var(--texto-secundario); font-size: 12px; font-weight: bold; margin-top: 8px; border-top: 1px dashed var(--borda); padding-top: 5px; text-align: center;">${jogo.placarFinal}</div>`
+                    : `<div id="placar-bilhete-${jogo.idJogo}-${index}"><div style="color:var(--texto-secundario); font-size: 11px; margin-top: 8px; border-top: 1px dashed var(--borda); padding-top: 5px; text-align: center;">🔎 Buscando status...</div></div>`;
+
+                if (!jogo.placarFinal) precisaBuscarAoVivo = true;
+
                 htmlJogos += `<div style="background: rgba(9, 14, 23, 0.6); padding: 12px; border-radius: 10px; margin-bottom: 10px; border-left: 4px solid var(--neon);">
                     <div style="font-size: 11px; color: var(--texto-secundario); margin-bottom: 4px;">${jogo.tituloJogo}</div>
                     <div style="display: flex; justify-content: space-between; align-items: center;">
                         <span style="font-size: 15px; font-weight: 900;">${jogo.palpite}</span>
                         <span style="color: var(--neon); font-weight: 900;">Odd: ${jogo.oddAposta.toFixed(2)}</span>
                     </div>
-                    <div id="placar-bilhete-${jogo.idJogo}"></div>
+                    ${htmlPlacar}
                 </div>`; 
             });
             document.getElementById('dig-jogos').innerHTML = htmlJogos;
@@ -838,9 +894,9 @@
             document.getElementById('tela-digital').style.opacity = '1';
             esconderLoading();
 
-            if(ligasBilhete.length > 0 && dados.s === 1) {
-                buscarPlacaresBilhete(ligasBilhete, dados.j);
-                setInterval(() => buscarPlacaresBilhete(ligasBilhete, dados.j), 300000);
+            if(ligasBilhete.length > 0 && precisaBuscarAoVivo && dados.s >= 1 && dados.s <= 3) {
+                buscarPlacaresBilhete(ligasBilhete, dados, blobId);
+                setInterval(() => buscarPlacaresBilhete(ligasBilhete, dados, blobId), 60000);
             }
         }
 
@@ -970,7 +1026,6 @@
                         });
 
                         // PLANO B (FALLBACK): Se a API não mandar a linha de 2.5 ou 1.5, o sistema CRIA uma odd base
-                        // Isso garante que seus mercados derivados NUNCA fiquem em branco
                         if(oddC > 0 && oddE > 0 && oddF > 0) {
                             if (oddM25 === 0) { oddM25 = 2.05; oddN25 = 1.75; }
                             if (oddM15 === 0) { oddM15 = 1.35; oddN15 = 3.10; }
