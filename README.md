@@ -844,7 +844,7 @@
             btn.disabled = true;
             btn.innerText = "⏳ Sincronizando...";
             
-            localStorage.removeItem(`xrsports_cache_${ligaFoco}`);
+            localStorage.removeItem(`xrsports_cache_v2_${ligaFoco}`);
             buscarJogosNaAPI().then(() => {
                 setTimeout(() => {
                     btn.innerText = "🔄 Atualizar";
@@ -857,7 +857,7 @@
         async function buscarJogosNaAPI() {
             let painelAviso = document.getElementById('status-msg');
             document.getElementById('container-jogos').innerHTML = "";
-            const cacheKey = `xrsports_cache_${ligaFoco}`;
+            const cacheKey = `xrsports_cache_v2_${ligaFoco}`;
             
             const cacheSalvo = localStorage.getItem(cacheKey);
 
@@ -908,8 +908,6 @@
                     jogosCarregados = []; let mapaScores = {};
                     if(Array.isArray(resScores)) { resScores.forEach(s => { mapaScores[s.id] = s; }); }
 
-                    let odd1X = 0, odd12 = 0, oddX2 = 0, oddDnbCasa = 0, oddDnbFora = 0, oddC_HT = 0, oddE_HT = 0, oddF_HT = 0, odd1X_HT = 0, odd12_HT = 0, oddX2_HT = 0;
-
                     resOdds.forEach(jogo => {
                         let horaDoJogo = new Date(jogo.commence_time); let dadosScore = mapaScores[jogo.id];
                         if ((dadosScore && dadosScore.completed) || horaDoJogo < horaLimiteSumir || !jogo.bookmakers || jogo.bookmakers.length === 0) return; 
@@ -936,6 +934,7 @@
                         let totalGols = placarCInt + placarFInt; 
                         let isBtts = placarCInt > 0 && placarFInt > 0;
 
+                        let odd1X = 0, odd12 = 0, oddX2 = 0, oddDnbCasa = 0, oddDnbFora = 0, oddC_HT = 0, oddE_HT = 0, oddF_HT = 0, odd1X_HT = 0, odd12_HT = 0, oddX2_HT = 0;
                         let oddC = 0, oddE = 0, oddF = 0, oddM15 = 0, oddN15 = 0, oddM25 = 0, oddN25 = 0, oddBttsSim = 0, oddBttsNao = 0, oddBttsHTSim = 0, oddBttsHTNao = 0;
                         let oddCrtM25 = 0, oddCrtN25 = 0, oddM05_HT = 0, oddN05_HT = 0, oddM15_HT = 0, oddN15_HT = 0;
                         
