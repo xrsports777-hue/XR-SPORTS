@@ -84,7 +84,7 @@
                     <div class="logo-badge"><span>XR</span></div>
                     <div class="logo-typography">
                         <div class="logo-title"><strong>XR</strong> SPORTS</div>
-                        <div class="logo-subtitle">A Banca Premium (V3)</div>
+                        <div class="logo-subtitle">A Banca Premium</div>
                     </div>
                 </div>
                 <button class="btn-sync" id="btn-sync-geral" onclick="forcarAtualizacao()">🔄 Atualizar</button>
