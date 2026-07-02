@@ -2,7 +2,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <!-- TAGS ANTI-CACHE PARA OBRIGAR O NAVEGADOR A ATUALIZAR -->
+    <!-- FORÇADOR DE ATUALIZAÇÃO -->
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
@@ -84,8 +84,7 @@
                     <div class="logo-badge"><span>XR</span></div>
                     <div class="logo-typography">
                         <div class="logo-title"><strong>XR</strong> SPORTS</div>
-                        <!-- MARCADOR DE SUCESSO AQUI: TEM QUE ESTAR 2.0 NA TELA -->
-                        <div class="logo-subtitle">A Banca Premium 2.0</div>
+                        <div class="logo-subtitle">A Banca Premium (V3)</div>
                     </div>
                 </div>
                 <button class="btn-sync" id="btn-sync-geral" onclick="forcarAtualizacao()">🔄 Atualizar</button>
@@ -220,6 +219,17 @@
     </div>
 
     <script>
+        // =======================================================================
+        // 🧹 EXTERMINADOR DE CACHE: Garante que você veja a versão v3 imediatamente
+        // =======================================================================
+        try {
+            Object.keys(localStorage).forEach(k => {
+                if (k.startsWith('xrsports_cache_') && !k.includes('_v3_')) {
+                    localStorage.removeItem(k);
+                }
+            });
+        } catch(e) {}
+
         // =======================================================================
         // 🛡️ SISTEMA DE BLINDAGEM EXTREMA FRONTEND (ANTI-CURIOSO)
         // =======================================================================
@@ -849,7 +859,7 @@
             btn.disabled = true;
             btn.innerText = "⏳ Sincronizando...";
             
-            localStorage.removeItem(`xrsports_cache_v2_${ligaFoco}`);
+            localStorage.removeItem(`xrsports_cache_v3_${ligaFoco}`);
             buscarJogosNaAPI().then(() => {
                 setTimeout(() => {
                     btn.innerText = "🔄 Atualizar";
@@ -862,7 +872,7 @@
         async function buscarJogosNaAPI() {
             let painelAviso = document.getElementById('status-msg');
             document.getElementById('container-jogos').innerHTML = "";
-            const cacheKey = `xrsports_cache_v2_${ligaFoco}`;
+            const cacheKey = `xrsports_cache_v3_${ligaFoco}`;
             
             const cacheSalvo = localStorage.getItem(cacheKey);
 
@@ -954,18 +964,25 @@
                             if(mH2H && oddC === 0) mH2H.outcomes.forEach(opc => { if(opc.name === jogo.home_team) oddC = opc.price; else if(opc.name === 'Draw') oddE = opc.price; else if(opc.name === jogo.away_team) oddF = opc.price; });
                             let mGols = bm.markets.find(m => m.key === 'totals');
                             if(mGols) mGols.outcomes.forEach(opc => {
-                                if(opc.name === 'Over') { if(opc.point === 1.5) oddM15 = Math.max(oddM15, opc.price); if(opc.point === 2.5) oddM25 = Math.max(oddM25, opc.price); }
-                                if(opc.name === 'Under') { if(opc.point === 1.5) oddN15 = Math.max(oddN15, opc.price); if(opc.point === 2.5) oddN25 = Math.max(oddN25, opc.price); }
+                                if(opc.name === 'Over') { if(opc.point == 1.5) oddM15 = Math.max(oddM15, opc.price); if(opc.point == 2.5) oddM25 = Math.max(oddM25, opc.price); }
+                                if(opc.name === 'Under') { if(opc.point == 1.5) oddN15 = Math.max(oddN15, opc.price); if(opc.point == 2.5) oddN25 = Math.max(oddN25, opc.price); }
                             });
                         });
+
+                        // PLANO B (FALLBACK): Se a API não mandar a linha de 2.5 ou 1.5, o sistema CRIA uma odd base
+                        // Isso garante que seus mercados derivados NUNCA fiquem em branco
+                        if(oddC > 0 && oddE > 0 && oddF > 0) {
+                            if (oddM25 === 0) { oddM25 = 2.05; oddN25 = 1.75; }
+                            if (oddM15 === 0) { oddM15 = 1.35; oddN15 = 3.10; }
+                        }
 
                         if (oddM25 > 0 && oddM15 === 0) { let pM25 = 1 / oddM25; let pM15 = Math.min(0.95, pM25 * 1.35); oddM15 = (1 / pM15) * 0.92; oddN15 = (1 / (1-pM15)) * 0.92; }
                         
                         if (oddM25 > 0) { let pBttsSim = Math.min(0.88, (1 / oddM25) * 1.05); oddBttsSim = (1 / pBttsSim) * 0.92; oddBttsNao = (1 / (1 - pBttsSim)) * 0.92; } else if (oddC > 0) { oddBttsSim = 1.85 * 0.92; oddBttsNao = 1.85 * 0.92; }
                         
-                        // NEW BTTS HT
+                        // BTTS HT
                         if (oddBttsSim > 0) {
-                            let pBttsHT_Y = Math.min(0.35, (1 / oddBttsSim) * 0.35); // Probabilidade bem menor de ambas no 1T
+                            let pBttsHT_Y = Math.min(0.35, (1 / oddBttsSim) * 0.35); 
                             oddBttsHTSim = (1 / pBttsHT_Y) * 0.92;
                             oddBttsHTNao = (1 / (1 - pBttsHT_Y)) * 0.92;
                         }
@@ -1031,7 +1048,6 @@
                             if (totalGols >= 2) { oddM15_HT = 0; oddN15_HT = 0; } else { oddN15_HT = 1.01 + (oddN15_HT - 1.01) * fUnder; oddM15_HT = oddM15_HT * fatorAumento; }
                             if (isBtts) { oddBttsSim = 0; oddBttsNao = 0; } else { oddBttsNao = 1.01 + (oddBttsNao - 1.01) * fUnder; oddBttsSim = oddBttsSim * fatorAumento; }
 
-                            // Desativa Ambas 1T apos o HT ou atualiza
                             if (minutosCorridos > 45) {
                                 oddBttsHTSim = 0; oddBttsHTNao = 0;
                             } else {
@@ -1063,7 +1079,7 @@
                             let probC = 1 / oddC, probE = 1 / oddE, probF = 1 / oddF;
                             odd1X = (1 / (probC + probE)) * 0.92; odd12 = (1 / (probC + probF)) * 0.92; oddX2 = (1 / (probF + probE)) * 0.92;
                             oddDnbCasa = (1 / (probC / (probC + probF))) * 0.92; oddDnbFora = (1 / (probF / (probC + probF))) * 0.92;
-                            if(minutosCorridos < 45) { 
+                            if(minutosCorridos <= 45) { 
                                 oddC_HT = oddC * 1.15; oddE_HT = oddE * 0.85; oddF_HT = oddF * 1.15; 
                                 let probC_HT = 1 / oddC_HT, probE_HT = 1 / oddE_HT, probF_HT = 1 / oddF_HT;
                                 odd1X_HT = (1 / (probC_HT + probE_HT)) * 0.92;
@@ -1167,92 +1183,95 @@
         function pintarJogosNaTela() {
             let htmlHTML = "";
             jogosCarregados.forEach(j => {
+                let safeCasa = j.casa.replace(/'/g, " ");
+                let safeFora = j.fora.replace(/'/g, " ");
+
                 let badgeDaHora = j.isLive ? (j.isIntervalo ? `<div class="badge-horario badge-intervalo">⏸️ INTERVALO</div>` : `<div class="badge-horario badge-aovivo">🔴 AO VIVO</div>`) : `<div class="badge-horario">📅 ${j.dataVisual}</div>`;
                 let centroPlacar = `<div class="vs-txt">X</div>`; 
                 if (j.isLive && j.placarC !== "" && j.placarF !== "") { centroPlacar = `<div class="placar-live">${j.placarC} - ${j.placarF}</div>`; }
                 
-                let btn1 = j.oddC > 0 ? `<div class="odd-btn" id="btn-${j.id}-1" onclick="clicarNaOdd('${j.id}', '${j.casa} x ${j.fora}', '${j.casa}', ${j.oddC}, '1')"><span class="odd-lbl">Casa</span><span class="odd-val">${j.oddC.toFixed(2)}</span></div>` : "";
-                let btnX = j.oddE > 0 ? `<div class="odd-btn" id="btn-${j.id}-X" onclick="clicarNaOdd('${j.id}', '${j.casa} x ${j.fora}', 'Empate', ${j.oddE}, 'X')"><span class="odd-lbl">Empate</span><span class="odd-val">${j.oddE.toFixed(2)}</span></div>` : "";
-                let btn2 = j.oddF > 0 ? `<div class="odd-btn" id="btn-${j.id}-2" onclick="clicarNaOdd('${j.id}', '${j.casa} x ${j.fora}', '${j.fora}', ${j.oddF}, '2')"><span class="odd-lbl">Fora</span><span class="odd-val">${j.oddF.toFixed(2)}</span></div>` : "";
+                let btn1 = j.oddC > 0 ? `<div class="odd-btn" id="btn-${j.id}-1" onclick="clicarNaOdd('${j.id}', '${safeCasa} x ${safeFora}', '${safeCasa}', ${j.oddC}, '1')"><span class="odd-lbl">Casa</span><span class="odd-val">${j.oddC.toFixed(2)}</span></div>` : "";
+                let btnX = j.oddE > 0 ? `<div class="odd-btn" id="btn-${j.id}-X" onclick="clicarNaOdd('${j.id}', '${safeCasa} x ${safeFora}', 'Empate', ${j.oddE}, 'X')"><span class="odd-lbl">Empate</span><span class="odd-val">${j.oddE.toFixed(2)}</span></div>` : "";
+                let btn2 = j.oddF > 0 ? `<div class="odd-btn" id="btn-${j.id}-2" onclick="clicarNaOdd('${j.id}', '${safeCasa} x ${safeFora}', '${safeFora}', ${j.oddF}, '2')"><span class="odd-lbl">Fora</span><span class="odd-val">${j.oddF.toFixed(2)}</span></div>` : "";
                 let bloco1X2 = (btn1 || btnX || btn2) ? `<div class="mercado-titulo">Vencedor Final</div><div class="odds-linha">${btn1}${btnX}${btn2}</div>` : "";
 
-                let btn1X = j.odd1X > 0 ? `<div class="odd-btn" id="btn-${j.id}-1X" onclick="clicarNaOdd('${j.id}', '${j.casa} x ${j.fora}', '${j.casa} ou Emp', ${j.odd1X}, '1X')"><span class="odd-lbl">Casa/Emp</span><span class="odd-val">${j.odd1X.toFixed(2)}</span></div>` : "";
-                let btn12 = j.odd12 > 0 ? `<div class="odd-btn" id="btn-${j.id}-12" onclick="clicarNaOdd('${j.id}', '${j.casa} x ${j.fora}', '${j.casa} ou ${j.fora}', ${j.odd12}, '12')"><span class="odd-lbl">Casa/Fora</span><span class="odd-val">${j.odd12.toFixed(2)}</span></div>` : "";
-                let btnX2 = j.oddX2 > 0 ? `<div class="odd-btn" id="btn-${j.id}-X2" onclick="clicarNaOdd('${j.id}', '${j.casa} x ${j.fora}', '${j.fora} ou Emp', ${j.oddX2}, 'X2')"><span class="odd-lbl">Fora/Emp</span><span class="odd-val">${j.oddX2.toFixed(2)}</span></div>` : "";
+                let btn1X = j.odd1X > 0 ? `<div class="odd-btn" id="btn-${j.id}-1X" onclick="clicarNaOdd('${j.id}', '${safeCasa} x ${safeFora}', '${safeCasa} ou Emp', ${j.odd1X}, '1X')"><span class="odd-lbl">Casa/Emp</span><span class="odd-val">${j.odd1X.toFixed(2)}</span></div>` : "";
+                let btn12 = j.odd12 > 0 ? `<div class="odd-btn" id="btn-${j.id}-12" onclick="clicarNaOdd('${j.id}', '${safeCasa} x ${safeFora}', '${safeCasa} ou ${safeFora}', ${j.odd12}, '12')"><span class="odd-lbl">Casa/Fora</span><span class="odd-val">${j.odd12.toFixed(2)}</span></div>` : "";
+                let btnX2 = j.oddX2 > 0 ? `<div class="odd-btn" id="btn-${j.id}-X2" onclick="clicarNaOdd('${j.id}', '${safeCasa} x ${safeFora}', '${safeFora} ou Emp', ${j.oddX2}, 'X2')"><span class="odd-lbl">Fora/Emp</span><span class="odd-val">${j.oddX2.toFixed(2)}</span></div>` : "";
                 let blocoDuchance = (btn1X || btn12 || btnX2) ? `<div class="mercado-titulo">Dupla Chance</div><div class="odds-linha">${btn1X}${btn12}${btnX2}</div>` : "";
 
-                let btn1XHT = j.odd1X_HT > 0 ? `<div class="odd-btn" id="btn-${j.id}-1XHT" onclick="clicarNaOdd('${j.id}', '${j.casa} x ${j.fora}', '${j.casa} ou Emp (1ºT)', ${j.odd1X_HT}, '1XHT')"><span class="odd-lbl">Casa/Emp</span><span class="odd-val">${j.odd1X_HT.toFixed(2)}</span></div>` : "";
-                let btn12HT = j.odd12_HT > 0 ? `<div class="odd-btn" id="btn-${j.id}-12HT" onclick="clicarNaOdd('${j.id}', '${j.casa} x ${j.fora}', 'Casa ou Fora (1ºT)', ${j.odd12_HT}, '12HT')"><span class="odd-lbl">Casa/Fora</span><span class="odd-val">${j.odd12_HT.toFixed(2)}</span></div>` : "";
-                let btnX2HT = j.oddX2_HT > 0 ? `<div class="odd-btn" id="btn-${j.id}-X2HT" onclick="clicarNaOdd('${j.id}', '${j.casa} x ${j.fora}', '${j.fora} ou Emp (1ºT)', ${j.oddX2_HT}, 'X2HT')"><span class="odd-lbl">Fora/Emp</span><span class="odd-val">${j.oddX2_HT.toFixed(2)}</span></div>` : "";
+                let btn1XHT = j.odd1X_HT > 0 ? `<div class="odd-btn" id="btn-${j.id}-1XHT" onclick="clicarNaOdd('${j.id}', '${safeCasa} x ${safeFora}', '${safeCasa} ou Emp (1ºT)', ${j.odd1X_HT}, '1XHT')"><span class="odd-lbl">Casa/Emp</span><span class="odd-val">${j.odd1X_HT.toFixed(2)}</span></div>` : "";
+                let btn12HT = j.odd12_HT > 0 ? `<div class="odd-btn" id="btn-${j.id}-12HT" onclick="clicarNaOdd('${j.id}', '${safeCasa} x ${safeFora}', 'Casa ou Fora (1ºT)', ${j.odd12_HT}, '12HT')"><span class="odd-lbl">Casa/Fora</span><span class="odd-val">${j.odd12_HT.toFixed(2)}</span></div>` : "";
+                let btnX2HT = j.oddX2_HT > 0 ? `<div class="odd-btn" id="btn-${j.id}-X2HT" onclick="clicarNaOdd('${j.id}', '${safeCasa} x ${safeFora}', '${safeFora} ou Emp (1ºT)', ${j.oddX2_HT}, 'X2HT')"><span class="odd-lbl">Fora/Emp</span><span class="odd-val">${j.oddX2_HT.toFixed(2)}</span></div>` : "";
                 let blocoDuchanceHT = (btn1XHT || btn12HT || btnX2HT) ? `<div class="mercado-titulo">Dupla Chance - 1º Tempo</div><div class="odds-linha">${btn1XHT}${btn12HT}${btnX2HT}</div>` : "";
 
-                let btnDNBC = j.oddDnbCasa > 0 ? `<div class="odd-btn" id="btn-${j.id}-DNBC" onclick="clicarNaOdd('${j.id}', '${j.casa} x ${j.fora}', '${j.casa} (DNB)', ${j.oddDnbCasa}, 'DNBC')"><span class="odd-lbl">Casa</span><span class="odd-val">${j.oddDnbCasa.toFixed(2)}</span></div>` : "";
-                let btnDNBF = j.oddDnbFora > 0 ? `<div class="odd-btn" id="btn-${j.id}-DNBF" onclick="clicarNaOdd('${j.id}', '${j.casa} x ${j.fora}', '${j.fora} (DNB)', ${j.oddDnbFora}, 'DNBF')"><span class="odd-lbl">Fora</span><span class="odd-val">${j.oddDnbFora.toFixed(2)}</span></div>` : "";
+                let btnDNBC = j.oddDnbCasa > 0 ? `<div class="odd-btn" id="btn-${j.id}-DNBC" onclick="clicarNaOdd('${j.id}', '${safeCasa} x ${safeFora}', '${safeCasa} (DNB)', ${j.oddDnbCasa}, 'DNBC')"><span class="odd-lbl">Casa</span><span class="odd-val">${j.oddDnbCasa.toFixed(2)}</span></div>` : "";
+                let btnDNBF = j.oddDnbFora > 0 ? `<div class="odd-btn" id="btn-${j.id}-DNBF" onclick="clicarNaOdd('${j.id}', '${safeCasa} x ${safeFora}', '${safeFora} (DNB)', ${j.oddDnbFora}, 'DNBF')"><span class="odd-lbl">Fora</span><span class="odd-val">${j.oddDnbFora.toFixed(2)}</span></div>` : "";
                 let blocoDnb = (btnDNBC || btnDNBF) ? `<div class="mercado-titulo">Empate Anula</div><div class="odds-linha-dupla">${btnDNBC}${btnDNBF}</div>` : "";
 
-                let btnBttsY = j.oddBttsSim > 0 ? `<div class="odd-btn" id="btn-${j.id}-BTTSY" onclick="clicarNaOdd('${j.id}', '${j.casa} x ${j.fora}', 'Ambas - Sim', ${j.oddBttsSim}, 'BTTSY')"><span class="odd-lbl">Sim</span><span class="odd-val">${j.oddBttsSim.toFixed(2)}</span></div>` : "";
-                let btnBttsN = j.oddBttsNao > 0 ? `<div class="odd-btn" id="btn-${j.id}-BTTSN" onclick="clicarNaOdd('${j.id}', '${j.casa} x ${j.fora}', 'Ambas - Não', ${j.oddBttsNao}, 'BTTSN')"><span class="odd-lbl">Não</span><span class="odd-val">${j.oddBttsNao.toFixed(2)}</span></div>` : "";
+                let btnBttsY = j.oddBttsSim > 0 ? `<div class="odd-btn" id="btn-${j.id}-BTTSY" onclick="clicarNaOdd('${j.id}', '${safeCasa} x ${safeFora}', 'Ambas - Sim', ${j.oddBttsSim}, 'BTTSY')"><span class="odd-lbl">Sim</span><span class="odd-val">${j.oddBttsSim.toFixed(2)}</span></div>` : "";
+                let btnBttsN = j.oddBttsNao > 0 ? `<div class="odd-btn" id="btn-${j.id}-BTTSN" onclick="clicarNaOdd('${j.id}', '${safeCasa} x ${safeFora}', 'Ambas - Não', ${j.oddBttsNao}, 'BTTSN')"><span class="odd-lbl">Não</span><span class="odd-val">${j.oddBttsNao.toFixed(2)}</span></div>` : "";
                 let blocoBtts = (btnBttsY || btnBttsN) ? `<div class="mercado-titulo">Ambas Marcam</div><div class="odds-linha-dupla">${btnBttsY}${btnBttsN}</div>` : "";
 
-                let btnBttsHTY = j.oddBttsHTSim > 0 ? `<div class="odd-btn" id="btn-${j.id}-BTTSHTY" onclick="clicarNaOdd('${j.id}', '${j.casa} x ${j.fora}', 'Ambas (1ºT) - Sim', ${j.oddBttsHTSim}, 'BTTSHTY')"><span class="odd-lbl">Sim (1ºT)</span><span class="odd-val">${j.oddBttsHTSim.toFixed(2)}</span></div>` : "";
-                let btnBttsHTN = j.oddBttsHTNao > 0 ? `<div class="odd-btn" id="btn-${j.id}-BTTSHTN" onclick="clicarNaOdd('${j.id}', '${j.casa} x ${j.fora}', 'Ambas (1ºT) - Não', ${j.oddBttsHTNao}, 'BTTSHTN')"><span class="odd-lbl">Não (1ºT)</span><span class="odd-val">${j.oddBttsHTNao.toFixed(2)}</span></div>` : "";
+                let btnBttsHTY = j.oddBttsHTSim > 0 ? `<div class="odd-btn" id="btn-${j.id}-BTTSHTY" onclick="clicarNaOdd('${j.id}', '${safeCasa} x ${safeFora}', 'Ambas (1ºT) - Sim', ${j.oddBttsHTSim}, 'BTTSHTY')"><span class="odd-lbl">Sim (1ºT)</span><span class="odd-val">${j.oddBttsHTSim.toFixed(2)}</span></div>` : "";
+                let btnBttsHTN = j.oddBttsHTNao > 0 ? `<div class="odd-btn" id="btn-${j.id}-BTTSHTN" onclick="clicarNaOdd('${j.id}', '${safeCasa} x ${safeFora}', 'Ambas (1ºT) - Não', ${j.oddBttsHTNao}, 'BTTSHTN')"><span class="odd-lbl">Não (1ºT)</span><span class="odd-val">${j.oddBttsHTNao.toFixed(2)}</span></div>` : "";
                 let blocoBttsHT = (btnBttsHTY || btnBttsHTN) ? `<div class="mercado-titulo">Ambas Marcam - 1º Tempo</div><div class="odds-linha-dupla">${btnBttsHTY}${btnBttsHTN}</div>` : "";
 
-                let botoesVamSim = ((j.oddVam_CS > 0) ? `<div class="odd-btn" id="btn-${j.id}-VAMCS" onclick="clicarNaOdd('${j.id}', '${j.casa} x ${j.fora}', '${j.casa} / Sim', ${j.oddVam_CS}, 'VAMCS')"><span class="odd-lbl">Casa/Sim</span><span class="odd-val">${j.oddVam_CS.toFixed(2)}</span></div>` : "") +
-                                   ((j.oddVam_ES > 0) ? `<div class="odd-btn" id="btn-${j.id}-VAMES" onclick="clicarNaOdd('${j.id}', '${j.casa} x ${j.fora}', 'Empate/Sim', ${j.oddVam_ES}, 'VAMES')"><span class="odd-lbl">Emp/Sim</span><span class="odd-val">${j.oddVam_ES.toFixed(2)}</span></div>` : "") +
-                                   ((j.oddVam_FS > 0) ? `<div class="odd-btn" id="btn-${j.id}-VAMFS" onclick="clicarNaOdd('${j.id}', '${j.casa} x ${j.fora}', '${j.fora} / Sim', ${j.oddVam_FS}, 'VAMFS')"><span class="odd-lbl">Fora/Sim</span><span class="odd-val">${j.oddVam_FS.toFixed(2)}</span></div>` : "");
+                let botoesVamSim = ((j.oddVam_CS > 0) ? `<div class="odd-btn" id="btn-${j.id}-VAMCS" onclick="clicarNaOdd('${j.id}', '${safeCasa} x ${safeFora}', '${safeCasa} / Sim', ${j.oddVam_CS}, 'VAMCS')"><span class="odd-lbl">Casa/Sim</span><span class="odd-val">${j.oddVam_CS.toFixed(2)}</span></div>` : "") +
+                                   ((j.oddVam_ES > 0) ? `<div class="odd-btn" id="btn-${j.id}-VAMES" onclick="clicarNaOdd('${j.id}', '${safeCasa} x ${safeFora}', 'Empate/Sim', ${j.oddVam_ES}, 'VAMES')"><span class="odd-lbl">Emp/Sim</span><span class="odd-val">${j.oddVam_ES.toFixed(2)}</span></div>` : "") +
+                                   ((j.oddVam_FS > 0) ? `<div class="odd-btn" id="btn-${j.id}-VAMFS" onclick="clicarNaOdd('${j.id}', '${safeCasa} x ${safeFora}', '${safeFora} / Sim', ${j.oddVam_FS}, 'VAMFS')"><span class="odd-lbl">Fora/Sim</span><span class="odd-val">${j.oddVam_FS.toFixed(2)}</span></div>` : "");
 
-                let botoesVamNao = ((j.oddVam_CN > 0) ? `<div class="odd-btn" id="btn-${j.id}-VAMCN" onclick="clicarNaOdd('${j.id}', '${j.casa} x ${j.fora}', '${j.casa} / Não', ${j.oddVam_CN}, 'VAMCN')"><span class="odd-lbl">Casa/Não</span><span class="odd-val">${j.oddVam_CN.toFixed(2)}</span></div>` : "") +
-                                   ((j.oddVam_EN > 0) ? `<div class="odd-btn" id="btn-${j.id}-VAMEN" onclick="clicarNaOdd('${j.id}', '${j.casa} x ${j.fora}', 'Empate/Não', ${j.oddVam_EN}, 'VAMEN')"><span class="odd-lbl">Emp/Não</span><span class="odd-val">${j.oddVam_EN.toFixed(2)}</span></div>` : "") +
-                                   ((j.oddVam_FN > 0) ? `<div class="odd-btn" id="btn-${j.id}-VAMFN" onclick="clicarNaOdd('${j.id}', '${j.casa} x ${j.fora}', '${j.fora} / Não', ${j.oddVam_FN}, 'VAMFN')"><span class="odd-lbl">Fora/Não</span><span class="odd-val">${j.oddVam_FN.toFixed(2)}</span></div>` : "");
+                let botoesVamNao = ((j.oddVam_CN > 0) ? `<div class="odd-btn" id="btn-${j.id}-VAMCN" onclick="clicarNaOdd('${j.id}', '${safeCasa} x ${safeFora}', '${safeCasa} / Não', ${j.oddVam_CN}, 'VAMCN')"><span class="odd-lbl">Casa/Não</span><span class="odd-val">${j.oddVam_CN.toFixed(2)}</span></div>` : "") +
+                                   ((j.oddVam_EN > 0) ? `<div class="odd-btn" id="btn-${j.id}-VAMEN" onclick="clicarNaOdd('${j.id}', '${safeCasa} x ${safeFora}', 'Empate/Não', ${j.oddVam_EN}, 'VAMEN')"><span class="odd-lbl">Emp/Não</span><span class="odd-val">${j.oddVam_EN.toFixed(2)}</span></div>` : "") +
+                                   ((j.oddVam_FN > 0) ? `<div class="odd-btn" id="btn-${j.id}-VAMFN" onclick="clicarNaOdd('${j.id}', '${safeCasa} x ${safeFora}', '${safeFora} / Não', ${j.oddVam_FN}, 'VAMFN')"><span class="odd-lbl">Fora/Não</span><span class="odd-val">${j.oddVam_FN.toFixed(2)}</span></div>` : "");
 
                 let blocoVAM = (botoesVamSim || botoesVamNao) ? `<div class="mercado-titulo">Vencedor e Ambos Marcam</div><div class="odds-linha">${botoesVamSim}</div><div class="odds-linha" style="margin-top:8px;">${botoesVamNao}</div>` : "";
 
-                let botoesVTGM25 = ((j.oddVTG_CM25 > 0) ? `<div class="odd-btn" id="btn-${j.id}-VTGCM25" onclick="clicarNaOdd('${j.id}', '${j.casa} x ${j.fora}', '${j.casa} / +2.5', ${j.oddVTG_CM25}, 'VTGCM25')"><span class="odd-lbl">Casa/+2.5</span><span class="odd-val">${j.oddVTG_CM25.toFixed(2)}</span></div>` : "") +
-                                   ((j.oddVTG_EM25 > 0) ? `<div class="odd-btn" id="btn-${j.id}-VTGEM25" onclick="clicarNaOdd('${j.id}', '${j.casa} x ${j.fora}', 'Empate / +2.5', ${j.oddVTG_EM25}, 'VTGEM25')"><span class="odd-lbl">Emp/+2.5</span><span class="odd-val">${j.oddVTG_EM25.toFixed(2)}</span></div>` : "") +
-                                   ((j.oddVTG_FM25 > 0) ? `<div class="odd-btn" id="btn-${j.id}-VTGFM25" onclick="clicarNaOdd('${j.id}', '${j.casa} x ${j.fora}', '${j.fora} / +2.5', ${j.oddVTG_FM25}, 'VTGFM25')"><span class="odd-lbl">Fora/+2.5</span><span class="odd-val">${j.oddVTG_FM25.toFixed(2)}</span></div>` : "");
+                let botoesVTGM25 = ((j.oddVTG_CM25 > 0) ? `<div class="odd-btn" id="btn-${j.id}-VTGCM25" onclick="clicarNaOdd('${j.id}', '${safeCasa} x ${safeFora}', '${safeCasa} / +2.5', ${j.oddVTG_CM25}, 'VTGCM25')"><span class="odd-lbl">Casa/+2.5</span><span class="odd-val">${j.oddVTG_CM25.toFixed(2)}</span></div>` : "") +
+                                   ((j.oddVTG_EM25 > 0) ? `<div class="odd-btn" id="btn-${j.id}-VTGEM25" onclick="clicarNaOdd('${j.id}', '${safeCasa} x ${safeFora}', 'Empate / +2.5', ${j.oddVTG_EM25}, 'VTGEM25')"><span class="odd-lbl">Emp/+2.5</span><span class="odd-val">${j.oddVTG_EM25.toFixed(2)}</span></div>` : "") +
+                                   ((j.oddVTG_FM25 > 0) ? `<div class="odd-btn" id="btn-${j.id}-VTGFM25" onclick="clicarNaOdd('${j.id}', '${safeCasa} x ${safeFora}', '${safeFora} / +2.5', ${j.oddVTG_FM25}, 'VTGFM25')"><span class="odd-lbl">Fora/+2.5</span><span class="odd-val">${j.oddVTG_FM25.toFixed(2)}</span></div>` : "");
 
-                let botoesVTGN25 = ((j.oddVTG_CN25 > 0) ? `<div class="odd-btn" id="btn-${j.id}-VTGCN25" onclick="clicarNaOdd('${j.id}', '${j.casa} x ${j.fora}', '${j.casa} / -2.5', ${j.oddVTG_CN25}, 'VTGCN25')"><span class="odd-lbl">Casa/-2.5</span><span class="odd-val">${j.oddVTG_CN25.toFixed(2)}</span></div>` : "") +
-                                   ((j.oddVTG_EN25 > 0) ? `<div class="odd-btn" id="btn-${j.id}-VTGEN25" onclick="clicarNaOdd('${j.id}', '${j.casa} x ${j.fora}', 'Empate / -2.5', ${j.oddVTG_EN25}, 'VTGEN25')"><span class="odd-lbl">Emp/-2.5</span><span class="odd-val">${j.oddVTG_EN25.toFixed(2)}</span></div>` : "") +
-                                   ((j.oddVTG_FN25 > 0) ? `<div class="odd-btn" id="btn-${j.id}-VTGFN25" onclick="clicarNaOdd('${j.id}', '${j.casa} x ${j.fora}', '${j.fora} / -2.5', ${j.oddVTG_FN25}, 'VTGFN25')"><span class="odd-lbl">Fora/-2.5</span><span class="odd-val">${j.oddVTG_FN25.toFixed(2)}</span></div>` : "");
+                let botoesVTGN25 = ((j.oddVTG_CN25 > 0) ? `<div class="odd-btn" id="btn-${j.id}-VTGCN25" onclick="clicarNaOdd('${j.id}', '${safeCasa} x ${safeFora}', '${safeCasa} / -2.5', ${j.oddVTG_CN25}, 'VTGCN25')"><span class="odd-lbl">Casa/-2.5</span><span class="odd-val">${j.oddVTG_CN25.toFixed(2)}</span></div>` : "") +
+                                   ((j.oddVTG_EN25 > 0) ? `<div class="odd-btn" id="btn-${j.id}-VTGEN25" onclick="clicarNaOdd('${j.id}', '${safeCasa} x ${safeFora}', 'Empate / -2.5', ${j.oddVTG_EN25}, 'VTGEN25')"><span class="odd-lbl">Emp/-2.5</span><span class="odd-val">${j.oddVTG_EN25.toFixed(2)}</span></div>` : "") +
+                                   ((j.oddVTG_FN25 > 0) ? `<div class="odd-btn" id="btn-${j.id}-VTGFN25" onclick="clicarNaOdd('${j.id}', '${safeCasa} x ${safeFora}', '${safeFora} / -2.5', ${j.oddVTG_FN25}, 'VTGFN25')"><span class="odd-lbl">Fora/-2.5</span><span class="odd-val">${j.oddVTG_FN25.toFixed(2)}</span></div>` : "");
 
                 let blocoVTG = (botoesVTGM25 || botoesVTGN25) ? `<div class="mercado-titulo">Vencedor e Total de Gols (2.5)</div><div class="odds-linha">${botoesVTGM25}</div><div class="odds-linha" style="margin-top:8px;">${botoesVTGN25}</div>` : "";
 
-                let botoesGols = ((j.oddM15 > 0) ? `<div class="odd-btn" id="btn-${j.id}-M15" onclick="clicarNaOdd('${j.id}', '${j.casa} x ${j.fora}', '+ 1.5 Gols', ${j.oddM15}, 'M15')"><span class="odd-lbl">+ 1.5 Gols</span><span class="odd-val">${j.oddM15.toFixed(2)}</span></div>` : "") +
-                                 ((j.oddN15 > 0) ? `<div class="odd-btn" id="btn-${j.id}-N15" onclick="clicarNaOdd('${j.id}', '${j.casa} x ${j.fora}', '- 1.5 Gols', ${j.oddN15}, 'N15')"><span class="odd-lbl">- 1.5 Gols</span><span class="odd-val">${j.oddN15.toFixed(2)}</span></div>` : "") +
-                                 ((j.oddM25 > 0) ? `<div class="odd-btn" id="btn-${j.id}-M25" onclick="clicarNaOdd('${j.id}', '${j.casa} x ${j.fora}', '+ 2.5 Gols', ${j.oddM25}, 'M25')"><span class="odd-lbl">+ 2.5 Gols</span><span class="odd-val">${j.oddM25.toFixed(2)}</span></div>` : "") +
-                                 ((j.oddN25 > 0) ? `<div class="odd-btn" id="btn-${j.id}-N25" onclick="clicarNaOdd('${j.id}', '${j.casa} x ${j.fora}', '- 2.5 Gols', ${j.oddN25}, 'N25')"><span class="odd-lbl">- 2.5 Gols</span><span class="odd-val">${j.oddN25.toFixed(2)}</span></div>` : "");
+                let botoesGols = ((j.oddM15 > 0) ? `<div class="odd-btn" id="btn-${j.id}-M15" onclick="clicarNaOdd('${j.id}', '${safeCasa} x ${safeFora}', '+ 1.5 Gols', ${j.oddM15}, 'M15')"><span class="odd-lbl">+ 1.5 Gols</span><span class="odd-val">${j.oddM15.toFixed(2)}</span></div>` : "") +
+                                 ((j.oddN15 > 0) ? `<div class="odd-btn" id="btn-${j.id}-N15" onclick="clicarNaOdd('${j.id}', '${safeCasa} x ${safeFora}', '- 1.5 Gols', ${j.oddN15}, 'N15')"><span class="odd-lbl">- 1.5 Gols</span><span class="odd-val">${j.oddN15.toFixed(2)}</span></div>` : "") +
+                                 ((j.oddM25 > 0) ? `<div class="odd-btn" id="btn-${j.id}-M25" onclick="clicarNaOdd('${j.id}', '${safeCasa} x ${safeFora}', '+ 2.5 Gols', ${j.oddM25}, 'M25')"><span class="odd-lbl">+ 2.5 Gols</span><span class="odd-val">${j.oddM25.toFixed(2)}</span></div>` : "") +
+                                 ((j.oddN25 > 0) ? `<div class="odd-btn" id="btn-${j.id}-N25" onclick="clicarNaOdd('${j.id}', '${safeCasa} x ${safeFora}', '- 2.5 Gols', ${j.oddN25}, 'N25')"><span class="odd-lbl">- 2.5 Gols</span><span class="odd-val">${j.oddN25.toFixed(2)}</span></div>` : "");
                 let blocoGols = botoesGols !== "" ? `<div class="mercado-titulo">Total de Gols</div><div class="odds-linha-dupla">${botoesGols}</div>` : "";
                 
-                let botoesGolsHT = ((j.oddM05_HT > 0) ? `<div class="odd-btn" id="btn-${j.id}-M05HT" onclick="clicarNaOdd('${j.id}', '${j.casa} x ${j.fora}', '+ 0.5 Gols (1ºT)', ${j.oddM05_HT}, 'M05HT')"><span class="odd-lbl">+ 0.5 (1ºT)</span><span class="odd-val">${j.oddM05_HT.toFixed(2)}</span></div>` : "") +
-                                   ((j.oddN05_HT > 0) ? `<div class="odd-btn" id="btn-${j.id}-N05HT" onclick="clicarNaOdd('${j.id}', '${j.casa} x ${j.fora}', '- 0.5 Gols (1ºT)', ${j.oddN05_HT}, 'N05HT')"><span class="odd-lbl">- 0.5 (1ºT)</span><span class="odd-val">${j.oddN05_HT.toFixed(2)}</span></div>` : "") +
-                                   ((j.oddM15_HT > 0) ? `<div class="odd-btn" id="btn-${j.id}-M15HT" onclick="clicarNaOdd('${j.id}', '${j.casa} x ${j.fora}', '+ 1.5 Gols (1ºT)', ${j.oddM15_HT}, 'M15HT')"><span class="odd-lbl">+ 1.5 (1ºT)</span><span class="odd-val">${j.oddM15_HT.toFixed(2)}</span></div>` : "") +
-                                   ((j.oddN15_HT > 0) ? `<div class="odd-btn" id="btn-${j.id}-N15HT" onclick="clicarNaOdd('${j.id}', '${j.casa} x ${j.fora}', '- 1.5 Gols (1ºT)', ${j.oddN15_HT}, 'N15HT')"><span class="odd-lbl">- 1.5 (1ºT)</span><span class="odd-val">${j.oddN15_HT.toFixed(2)}</span></div>` : "");
+                let botoesGolsHT = ((j.oddM05_HT > 0) ? `<div class="odd-btn" id="btn-${j.id}-M05HT" onclick="clicarNaOdd('${j.id}', '${safeCasa} x ${safeFora}', '+ 0.5 Gols (1ºT)', ${j.oddM05_HT}, 'M05HT')"><span class="odd-lbl">+ 0.5 (1ºT)</span><span class="odd-val">${j.oddM05_HT.toFixed(2)}</span></div>` : "") +
+                                   ((j.oddN05_HT > 0) ? `<div class="odd-btn" id="btn-${j.id}-N05HT" onclick="clicarNaOdd('${j.id}', '${safeCasa} x ${safeFora}', '- 0.5 Gols (1ºT)', ${j.oddN05_HT}, 'N05HT')"><span class="odd-lbl">- 0.5 (1ºT)</span><span class="odd-val">${j.oddN05_HT.toFixed(2)}</span></div>` : "") +
+                                   ((j.oddM15_HT > 0) ? `<div class="odd-btn" id="btn-${j.id}-M15HT" onclick="clicarNaOdd('${j.id}', '${safeCasa} x ${safeFora}', '+ 1.5 Gols (1ºT)', ${j.oddM15_HT}, 'M15HT')"><span class="odd-lbl">+ 1.5 (1ºT)</span><span class="odd-val">${j.oddM15_HT.toFixed(2)}</span></div>` : "") +
+                                   ((j.oddN15_HT > 0) ? `<div class="odd-btn" id="btn-${j.id}-N15HT" onclick="clicarNaOdd('${j.id}', '${safeCasa} x ${safeFora}', '- 1.5 Gols (1ºT)', ${j.oddN15_HT}, 'N15HT')"><span class="odd-lbl">- 1.5 (1ºT)</span><span class="odd-val">${j.oddN15_HT.toFixed(2)}</span></div>` : "");
                 let blocoGolsHT = botoesGolsHT !== "" ? `<div class="mercado-titulo">Gols - 1º Tempo</div><div class="odds-linha-dupla">${botoesGolsHT}</div>` : "";
 
-                let botoesTgC = ((j.oddC_M05 > 0) ? `<div class="odd-btn" id="btn-${j.id}-TGCM05" onclick="clicarNaOdd('${j.id}', '${j.casa} x ${j.fora}', '${j.casa} (+0.5 Gols)', ${j.oddC_M05}, 'TGCM05')"><span class="odd-lbl">+ 0.5 Gols</span><span class="odd-val">${j.oddC_M05.toFixed(2)}</span></div>` : "") +
-                                ((j.oddC_N05 > 0) ? `<div class="odd-btn" id="btn-${j.id}-TGCN05" onclick="clicarNaOdd('${j.id}', '${j.casa} x ${j.fora}', '${j.casa} (-0.5 Gols)', ${j.oddC_N05}, 'TGCN05')"><span class="odd-lbl">- 0.5 Gols</span><span class="odd-val">${j.oddC_N05.toFixed(2)}</span></div>` : "") +
-                                ((j.oddC_M15 > 0) ? `<div class="odd-btn" id="btn-${j.id}-TGCM15" onclick="clicarNaOdd('${j.id}', '${j.casa} x ${j.fora}', '${j.casa} (+1.5 Gols)', ${j.oddC_M15}, 'TGCM15')"><span class="odd-lbl">+ 1.5 Gols</span><span class="odd-val">${j.oddC_M15.toFixed(2)}</span></div>` : "") +
-                                ((j.oddC_N15 > 0) ? `<div class="odd-btn" id="btn-${j.id}-TGCN15" onclick="clicarNaOdd('${j.id}', '${j.casa} x ${j.fora}', '${j.casa} (-1.5 Gols)', ${j.oddC_N15}, 'TGCN15')"><span class="odd-lbl">- 1.5 Gols</span><span class="odd-val">${j.oddC_N15.toFixed(2)}</span></div>` : "") +
-                                ((j.oddC_M25 > 0) ? `<div class="odd-btn" id="btn-${j.id}-TGCM25" onclick="clicarNaOdd('${j.id}', '${j.casa} x ${j.fora}', '${j.casa} (+2.5 Gols)', ${j.oddC_M25}, 'TGCM25')"><span class="odd-lbl">+ 2.5 Gols</span><span class="odd-val">${j.oddC_M25.toFixed(2)}</span></div>` : "") +
-                                ((j.oddC_N25 > 0) ? `<div class="odd-btn" id="btn-${j.id}-TGCN25" onclick="clicarNaOdd('${j.id}', '${j.casa} x ${j.fora}', '${j.casa} (-2.5 Gols)', ${j.oddC_N25}, 'TGCN25')"><span class="odd-lbl">- 2.5 Gols</span><span class="odd-val">${j.oddC_N25.toFixed(2)}</span></div>` : "");
+                let botoesTgC = ((j.oddC_M05 > 0) ? `<div class="odd-btn" id="btn-${j.id}-TGCM05" onclick="clicarNaOdd('${j.id}', '${safeCasa} x ${safeFora}', '${safeCasa} (+0.5 Gols)', ${j.oddC_M05}, 'TGCM05')"><span class="odd-lbl">+ 0.5 Gols</span><span class="odd-val">${j.oddC_M05.toFixed(2)}</span></div>` : "") +
+                                ((j.oddC_N05 > 0) ? `<div class="odd-btn" id="btn-${j.id}-TGCN05" onclick="clicarNaOdd('${j.id}', '${safeCasa} x ${safeFora}', '${safeCasa} (-0.5 Gols)', ${j.oddC_N05}, 'TGCN05')"><span class="odd-lbl">- 0.5 Gols</span><span class="odd-val">${j.oddC_N05.toFixed(2)}</span></div>` : "") +
+                                ((j.oddC_M15 > 0) ? `<div class="odd-btn" id="btn-${j.id}-TGCM15" onclick="clicarNaOdd('${j.id}', '${safeCasa} x ${safeFora}', '${safeCasa} (+1.5 Gols)', ${j.oddC_M15}, 'TGCM15')"><span class="odd-lbl">+ 1.5 Gols</span><span class="odd-val">${j.oddC_M15.toFixed(2)}</span></div>` : "") +
+                                ((j.oddC_N15 > 0) ? `<div class="odd-btn" id="btn-${j.id}-TGCN15" onclick="clicarNaOdd('${j.id}', '${safeCasa} x ${safeFora}', '${safeCasa} (-1.5 Gols)', ${j.oddC_N15}, 'TGCN15')"><span class="odd-lbl">- 1.5 Gols</span><span class="odd-val">${j.oddC_N15.toFixed(2)}</span></div>` : "") +
+                                ((j.oddC_M25 > 0) ? `<div class="odd-btn" id="btn-${j.id}-TGCM25" onclick="clicarNaOdd('${j.id}', '${safeCasa} x ${safeFora}', '${safeCasa} (+2.5 Gols)', ${j.oddC_M25}, 'TGCM25')"><span class="odd-lbl">+ 2.5 Gols</span><span class="odd-val">${j.oddC_M25.toFixed(2)}</span></div>` : "") +
+                                ((j.oddC_N25 > 0) ? `<div class="odd-btn" id="btn-${j.id}-TGCN25" onclick="clicarNaOdd('${j.id}', '${safeCasa} x ${safeFora}', '${safeCasa} (-2.5 Gols)', ${j.oddC_N25}, 'TGCN25')"><span class="odd-lbl">- 2.5 Gols</span><span class="odd-val">${j.oddC_N25.toFixed(2)}</span></div>` : "");
                 let blocoTgCasa = botoesTgC !== "" ? `<div class="mercado-titulo">Gols da Casa (${j.casa})</div><div class="odds-linha-dupla">${botoesTgC}</div>` : "";
 
-                let botoesTgF = ((j.oddF_M05 > 0) ? `<div class="odd-btn" id="btn-${j.id}-TGFM05" onclick="clicarNaOdd('${j.id}', '${j.casa} x ${j.fora}', '${j.fora} (+0.5 Gols)', ${j.oddF_M05}, 'TGFM05')"><span class="odd-lbl">+ 0.5 Gols</span><span class="odd-val">${j.oddF_M05.toFixed(2)}</span></div>` : "") +
-                                ((j.oddF_N05 > 0) ? `<div class="odd-btn" id="btn-${j.id}-TGFN05" onclick="clicarNaOdd('${j.id}', '${j.casa} x ${j.fora}', '${j.fora} (-0.5 Gols)', ${j.oddF_N05}, 'TGFN05')"><span class="odd-lbl">- 0.5 Gols</span><span class="odd-val">${j.oddF_N05.toFixed(2)}</span></div>` : "") +
-                                ((j.oddF_M15 > 0) ? `<div class="odd-btn" id="btn-${j.id}-TGFM15" onclick="clicarNaOdd('${j.id}', '${j.casa} x ${j.fora}', '${j.fora} (+1.5 Gols)', ${j.oddF_M15}, 'TGFM15')"><span class="odd-lbl">+ 1.5 Gols</span><span class="odd-val">${j.oddF_M15.toFixed(2)}</span></div>` : "") +
-                                ((j.oddF_N15 > 0) ? `<div class="odd-btn" id="btn-${j.id}-TGFN15" onclick="clicarNaOdd('${j.id}', '${j.casa} x ${j.fora}', '${j.fora} (-1.5 Gols)', ${j.oddF_N15}, 'TGFN15')"><span class="odd-lbl">- 1.5 Gols</span><span class="odd-val">${j.oddF_N15.toFixed(2)}</span></div>` : "") +
-                                ((j.oddF_M25 > 0) ? `<div class="odd-btn" id="btn-${j.id}-TGFM25" onclick="clicarNaOdd('${j.id}', '${j.casa} x ${j.fora}', '${j.fora} (+2.5 Gols)', ${j.oddF_M25}, 'TGFM25')"><span class="odd-lbl">+ 2.5 Gols</span><span class="odd-val">${j.oddF_M25.toFixed(2)}</span></div>` : "") +
-                                ((j.oddF_N25 > 0) ? `<div class="odd-btn" id="btn-${j.id}-TGFN25" onclick="clicarNaOdd('${j.id}', '${j.casa} x ${j.fora}', '${j.fora} (-2.5 Gols)', ${j.oddF_N25}, 'TGFN25')"><span class="odd-lbl">- 2.5 Gols</span><span class="odd-val">${j.oddF_N25.toFixed(2)}</span></div>` : "");
+                let botoesTgF = ((j.oddF_M05 > 0) ? `<div class="odd-btn" id="btn-${j.id}-TGFM05" onclick="clicarNaOdd('${j.id}', '${safeCasa} x ${safeFora}', '${safeFora} (+0.5 Gols)', ${j.oddF_M05}, 'TGFM05')"><span class="odd-lbl">+ 0.5 Gols</span><span class="odd-val">${j.oddF_M05.toFixed(2)}</span></div>` : "") +
+                                ((j.oddF_N05 > 0) ? `<div class="odd-btn" id="btn-${j.id}-TGFN05" onclick="clicarNaOdd('${j.id}', '${safeCasa} x ${safeFora}', '${safeFora} (-0.5 Gols)', ${j.oddF_N05}, 'TGFN05')"><span class="odd-lbl">- 0.5 Gols</span><span class="odd-val">${j.oddF_N05.toFixed(2)}</span></div>` : "") +
+                                ((j.oddF_M15 > 0) ? `<div class="odd-btn" id="btn-${j.id}-TGFM15" onclick="clicarNaOdd('${j.id}', '${safeCasa} x ${safeFora}', '${safeFora} (+1.5 Gols)', ${j.oddF_M15}, 'TGFM15')"><span class="odd-lbl">+ 1.5 Gols</span><span class="odd-val">${j.oddF_M15.toFixed(2)}</span></div>` : "") +
+                                ((j.oddF_N15 > 0) ? `<div class="odd-btn" id="btn-${j.id}-TGFN15" onclick="clicarNaOdd('${j.id}', '${safeCasa} x ${safeFora}', '${safeFora} (-1.5 Gols)', ${j.oddF_N15}, 'TGFN15')"><span class="odd-lbl">- 1.5 Gols</span><span class="odd-val">${j.oddF_N15.toFixed(2)}</span></div>` : "") +
+                                ((j.oddF_M25 > 0) ? `<div class="odd-btn" id="btn-${j.id}-TGFM25" onclick="clicarNaOdd('${j.id}', '${safeCasa} x ${safeFora}', '${safeFora} (+2.5 Gols)', ${j.oddF_M25}, 'TGFM25')"><span class="odd-lbl">+ 2.5 Gols</span><span class="odd-val">${j.oddF_M25.toFixed(2)}</span></div>` : "") +
+                                ((j.oddF_N25 > 0) ? `<div class="odd-btn" id="btn-${j.id}-TGFN25" onclick="clicarNaOdd('${j.id}', '${safeCasa} x ${safeFora}', '${safeFora} (-2.5 Gols)', ${j.oddF_N25}, 'TGFN25')"><span class="odd-lbl">- 2.5 Gols</span><span class="odd-val">${j.oddF_N25.toFixed(2)}</span></div>` : "");
                 let blocoTgFora = botoesTgF !== "" ? `<div class="mercado-titulo">Gols do Fora (${j.fora})</div><div class="odds-linha-dupla">${botoesTgF}</div>` : "";
 
-                let botoesCartoes = ((j.oddCrtM25 > 0) ? `<div class="odd-btn" id="btn-${j.id}-CM25" onclick="clicarNaOdd('${j.id}', '${j.casa} x ${j.fora}', '+ 2.5 Cartões', ${j.oddCrtM25}, 'CM25')"><span class="odd-lbl">+ 2.5</span><span class="odd-val">${j.oddCrtM25.toFixed(2)}</span></div>` : "") +
-                                     ((j.oddCrtN25 > 0) ? `<div class="odd-btn" id="btn-${j.id}-CN25" onclick="clicarNaOdd('${j.id}', '${j.casa} x ${j.fora}', '- 2.5 Cartões', ${j.oddCrtN25}, 'CN25')"><span class="odd-lbl">- 2.5</span><span class="odd-val">${j.oddCrtN25.toFixed(2)}</span></div>` : "");
+                let botoesCartoes = ((j.oddCrtM25 > 0) ? `<div class="odd-btn" id="btn-${j.id}-CM25" onclick="clicarNaOdd('${j.id}', '${safeCasa} x ${safeFora}', '+ 2.5 Cartões', ${j.oddCrtM25}, 'CM25')"><span class="odd-lbl">+ 2.5</span><span class="odd-val">${j.oddCrtM25.toFixed(2)}</span></div>` : "") +
+                                     ((j.oddCrtN25 > 0) ? `<div class="odd-btn" id="btn-${j.id}-CN25" onclick="clicarNaOdd('${j.id}', '${safeCasa} x ${safeFora}', '- 2.5 Cartões', ${j.oddCrtN25}, 'CN25')"><span class="odd-lbl">- 2.5</span><span class="odd-val">${j.oddCrtN25.toFixed(2)}</span></div>` : "");
                 let blocoCartoes = botoesCartoes !== "" ? `<div class="mercado-titulo">Cartões Amarelos</div><div class="odds-linha-dupla">${botoesCartoes}</div>` : "";
 
-                let btn1HT = j.oddC_HT > 0 ? `<div class="odd-btn" id="btn-${j.id}-1HT" onclick="clicarNaOdd('${j.id}', '${j.casa} x ${j.fora}', '${j.casa} (1ºT)', ${j.oddC_HT}, '1HT')"><span class="odd-lbl">Casa</span><span class="odd-val">${j.oddC_HT.toFixed(2)}</span></div>` : "";
-                let btnXHT = j.oddE_HT > 0 ? `<div class="odd-btn" id="btn-${j.id}-XHT" onclick="clicarNaOdd('${j.id}', '${j.casa} x ${j.fora}', 'Empate (1ºT)', ${j.oddE_HT}, 'XHT')"><span class="odd-lbl">Empate</span><span class="odd-val">${j.oddE_HT.toFixed(2)}</span></div>` : "";
-                let btn2HT = j.oddF_HT > 0 ? `<div class="odd-btn" id="btn-${j.id}-2HT" onclick="clicarNaOdd('${j.id}', '${j.casa} x ${j.fora}', '${j.fora} (1ºT)', ${j.oddF_HT}, '2HT')"><span class="odd-lbl">Fora</span><span class="odd-val">${j.oddF_HT.toFixed(2)}</span></div>` : "";
+                let btn1HT = j.oddC_HT > 0 ? `<div class="odd-btn" id="btn-${j.id}-1HT" onclick="clicarNaOdd('${j.id}', '${safeCasa} x ${safeFora}', '${safeCasa} (1ºT)', ${j.oddC_HT}, '1HT')"><span class="odd-lbl">Casa</span><span class="odd-val">${j.oddC_HT.toFixed(2)}</span></div>` : "";
+                let btnXHT = j.oddE_HT > 0 ? `<div class="odd-btn" id="btn-${j.id}-XHT" onclick="clicarNaOdd('${j.id}', '${safeCasa} x ${safeFora}', 'Empate (1ºT)', ${j.oddE_HT}, 'XHT')"><span class="odd-lbl">Empate</span><span class="odd-val">${j.oddE_HT.toFixed(2)}</span></div>` : "";
+                let btn2HT = j.oddF_HT > 0 ? `<div class="odd-btn" id="btn-${j.id}-2HT" onclick="clicarNaOdd('${j.id}', '${safeCasa} x ${safeFora}', '${safeFora} (1ºT)', ${j.oddF_HT}, '2HT')"><span class="odd-lbl">Fora</span><span class="odd-val">${j.oddF_HT.toFixed(2)}</span></div>` : "";
                 let blocoHT = (btn1HT || btnXHT || btn2HT) ? `<div class="mercado-titulo">Vencedor - 1º Tempo</div><div class="odds-linha">${btn1HT}${btnXHT}${btn2HT}</div>` : "";
 
                 htmlHTML += `<div class="card-jogo"><div class="card-topo"><span class="liga-tag">${nomeLigaFoco}</span>${badgeDaHora}</div><div class="placar-box"><div class="time-box">${desenharEscudo(j.casa)}<span class="nome-time">${j.casa}</span></div>${centroPlacar}<div class="time-box visitante">${desenharEscudo(j.fora)}<span class="nome-time">${j.fora}</span></div></div>${bloco1X2}${blocoHT}${blocoDuchance}${blocoDuchanceHT}${blocoDnb}${blocoBtts}${blocoBttsHT}${blocoVAM}${blocoVTG}${blocoGolsHT}${blocoGols}${blocoTgCasa}${blocoTgFora}${blocoCartoes}</div>`;
