@@ -821,7 +821,7 @@
                     }
 
                     if(s.completed) {
-                        jogo.placarFinal = `🏁 FIM DE JOGO: ${placarCasa} - ${placarFora}`;
+                        jogo.placarFinal = `🏁 JOGO FINALIZADO: ${placarCasa} - ${placarFora}`;
                         teveAlteracao = true; 
                         divPlacar.innerHTML = `<div style="color:var(--texto-secundario); font-size: 12px; font-weight: bold; margin-top: 8px; border-top: 1px dashed var(--borda); padding-top: 5px; text-align: center;">${jogo.placarFinal}</div>`;
                     } else if (s.scores && s.scores.length > 0) {
