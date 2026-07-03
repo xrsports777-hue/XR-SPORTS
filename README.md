@@ -356,32 +356,36 @@
         async function salvarNaNuvem(dados) {
             try { dados.hash = btoa(`${dados.v}-${dados.o}-${dados.p}`); } catch(e) {} 
 
-            try {
-                let res = await fetch("https://jsonblob.com/api/jsonBlob", {
-                    method: "POST", headers: { "Content-Type": "application/json", "Accept": "application/json" },
-                    body: JSON.stringify(dados)
-                });
-                if (res.ok) {
-                    let location = res.headers.get("Location");
-                    if (location) { let parts = location.split('/'); return "BLB-" + parts[parts.length - 1]; }
-                }
-            } catch(e) { console.warn("JSONBlob falhou..."); }
-
-            for (let i = 1; i <= 2; i++) {
+            // Sistema de insistência: tenta até 3 vezes seguidas sem o cliente perceber
+            for (let i = 0; i < 3; i++) {
+                // Tenta API 1 (Restful)
                 try {
                     let jsonReq = await fetch("https://api.restful-api.dev/objects", {
                         method: "POST", headers: { "Content-Type": "application/json" },
                         body: JSON.stringify({ name: "XRSportsTicket", data: dados })
                     });
                     if (jsonReq.ok) { let json = await jsonReq.json(); return "RST-" + json.id; }
-                } catch (erro) { await new Promise(r => setTimeout(r, 800)); }
+                } catch (erro) {}
+
+                // Tenta API 2 (JSONBlob)
+                try {
+                    let res = await fetch("https://jsonblob.com/api/jsonBlob", {
+                        method: "POST", headers: { "Content-Type": "application/json", "Accept": "application/json" },
+                        body: JSON.stringify(dados)
+                    });
+                    if (res.ok) {
+                        let location = res.headers.get("Location");
+                        if (location) { let parts = location.split('/'); return "BLB-" + parts[parts.length - 1]; }
+                    }
+                } catch(e) {}
+
+                // Aguarda 1 segundo antes de tentar novamente para não ser bloqueado
+                if (i < 2) await new Promise(r => setTimeout(r, 1000));
             }
             
-            try {
-                let dadosString = JSON.stringify(dados);
-                let base64 = btoa(encodeURIComponent(dadosString));
-                return "OFF-" + encodeURIComponent(base64);
-            } catch(e) { return null; }
+            // Removemos a geração do link GIGANTE (OFF-). 
+            // Se falhar tudo, retorna nulo para avisar o cliente.
+            return null; 
         }
 
         async function lerDaNuvem(blobId) {
@@ -763,7 +767,8 @@
                 let textoZap = `⚡ *XR SPORTS - NOVA APOSTA* ⚡%0A📌 PIN: *${codigoPIN}*%0A💰 Valor: *R$ ${valorDep.toFixed(2)}*%0A%0A👉 *Valide meu bilhete no link abaixo:*%0A${linkAcompanhar}`;
                 window.location.href = `https://wa.me/${NUMERO_WHATSAPP}?text=${textoZap}`;
             } else { 
-                mostrarToast("Erro Crítico de Conexão. Tente novamente.", "erro"); 
+                // Em vez de gerar o link gigante bugado, instrui o cliente a tentar de novo
+                mostrarToast("Servidor congestionado. Por favor, clique em 'Enviar' novamente.", "erro"); 
             }
         }
 
