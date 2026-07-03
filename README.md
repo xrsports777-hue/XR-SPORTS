@@ -356,9 +356,19 @@
         async function salvarNaNuvem(dados) {
             try { dados.hash = btoa(`${dados.v}-${dados.o}-${dados.p}`); } catch(e) {} 
 
-            // Sistema de insistência: tenta até 3 vezes seguidas sem o cliente perceber
+            // Sistema de insistência com 3 Servidores Diferentes
             for (let i = 0; i < 3; i++) {
-                // Tenta API 1 (Restful)
+                
+                // TENTATIVA 1: NPoint (Mais rápido e estável)
+                try {
+                    let res = await fetch("https://api.npoint.io", {
+                        method: "POST", headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify(dados)
+                    });
+                    if (res.ok) { let json = await res.json(); return "NPT-" + json.id; }
+                } catch(e) {}
+
+                // TENTATIVA 2: Restful API
                 try {
                     let jsonReq = await fetch("https://api.restful-api.dev/objects", {
                         method: "POST", headers: { "Content-Type": "application/json" },
@@ -367,7 +377,7 @@
                     if (jsonReq.ok) { let json = await jsonReq.json(); return "RST-" + json.id; }
                 } catch (erro) {}
 
-                // Tenta API 2 (JSONBlob)
+                // TENTATIVA 3: JSONBlob
                 try {
                     let res = await fetch("https://jsonblob.com/api/jsonBlob", {
                         method: "POST", headers: { "Content-Type": "application/json", "Accept": "application/json" },
@@ -379,22 +389,27 @@
                     }
                 } catch(e) {}
 
-                // Aguarda 1 segundo antes de tentar novamente para não ser bloqueado
+                // Aguarda 1 segundo antes de tentar o loop novamente
                 if (i < 2) await new Promise(r => setTimeout(r, 1000));
             }
             
-            // Retorna nulo e impede a geração de links imensos
-            return null; 
+            return null; // Retorna null apenas se as 3 APIs falharem 3 vezes seguidas
         }
 
         async function lerDaNuvem(blobId) {
             if (!blobId) return null;
-            
             let antiCache = `?_t=${new Date().getTime()}`;
 
-            // Isso garante que bilhetes antigos que os clientes abrirão continuem funcionando
             if (blobId.startsWith("OFF-")) { 
                 try { return JSON.parse(decodeURIComponent(atob(decodeURIComponent(blobId.replace("OFF-", ""))))); } catch(e) { return null; } 
+            }
+            // NOVO: Lê da API NPoint
+            if (blobId.startsWith("NPT-")) {
+                let id = blobId.replace("NPT-", "");
+                try { 
+                    let res = await fetch(`https://api.npoint.io/${id}${antiCache}`, { method: 'GET', headers: fetchHeaders, cache: 'no-store' }); 
+                    if(res.ok) return await res.json(); 
+                } catch(e) {}
             }
             if (blobId.startsWith("RST-")) {
                 let id = blobId.replace("RST-", "");
@@ -414,8 +429,17 @@
         }
 
         async function atualizarNaNuvem(blobId, dados) {
-            if (blobId.startsWith("OFF-")) { 
-                return false; 
+            if (blobId.startsWith("OFF-")) return false; 
+            
+            // NOVO: Atualiza na API NPoint
+            if (blobId.startsWith("NPT-")) {
+                let id = blobId.replace("NPT-", "");
+                try { 
+                    let res = await fetch(`https://api.npoint.io/${id}`, { 
+                        method: 'POST', headers: { 'Content-Type': 'application/json', "Accept": "application/json" }, body: JSON.stringify(dados) 
+                    }); 
+                    return res.ok ? blobId : false; 
+                } catch(e) { return false; }
             }
             if (blobId.startsWith("BLB-")) {
                 let id = blobId.replace("BLB-", "");
