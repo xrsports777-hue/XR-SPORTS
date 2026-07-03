@@ -383,8 +383,7 @@
                 if (i < 2) await new Promise(r => setTimeout(r, 1000));
             }
             
-            // Removemos a geração do link GIGANTE (OFF-). 
-            // Se falhar tudo, retorna nulo para avisar o cliente.
+            // Retorna nulo e impede a geração de links imensos
             return null; 
         }
 
@@ -393,6 +392,7 @@
             
             let antiCache = `?_t=${new Date().getTime()}`;
 
+            // Isso garante que bilhetes antigos que os clientes abrirão continuem funcionando
             if (blobId.startsWith("OFF-")) { 
                 try { return JSON.parse(decodeURIComponent(atob(decodeURIComponent(blobId.replace("OFF-", ""))))); } catch(e) { return null; } 
             }
@@ -767,8 +767,7 @@
                 let textoZap = `⚡ *XR SPORTS - NOVA APOSTA* ⚡%0A📌 PIN: *${codigoPIN}*%0A💰 Valor: *R$ ${valorDep.toFixed(2)}*%0A%0A👉 *Valide meu bilhete no link abaixo:*%0A${linkAcompanhar}`;
                 window.location.href = `https://wa.me/${NUMERO_WHATSAPP}?text=${textoZap}`;
             } else { 
-                // Em vez de gerar o link gigante bugado, instrui o cliente a tentar de novo
-                mostrarToast("Servidor congestionado. Por favor, clique em 'Enviar' novamente.", "erro"); 
+                mostrarToast("Os servidores estão sobrecarregados no momento. Tente novamente em alguns segundos.", "erro"); 
             }
         }
 
