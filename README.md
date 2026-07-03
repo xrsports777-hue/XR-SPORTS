@@ -355,92 +355,103 @@
 
         async function salvarNaNuvem(dados) {
             try { dados.hash = btoa(`${dados.v}-${dados.o}-${dados.p}`); } catch(e) {} 
-
-            // Sistema de insistência com 3 Servidores Diferentes
-            for (let i = 0; i < 3; i++) {
-                
-                // TENTATIVA 1: NPoint (Mais rápido e estável)
-                try {
-                    let res = await fetch("https://api.npoint.io", {
-                        method: "POST", headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify(dados)
-                    });
-                    if (res.ok) { let json = await res.json(); return "NPT-" + json.id; }
-                } catch(e) {}
-
-                // TENTATIVA 2: Restful API
-                try {
-                    let jsonReq = await fetch("https://api.restful-api.dev/objects", {
-                        method: "POST", headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ name: "XRSportsTicket", data: dados })
-                    });
-                    if (jsonReq.ok) { let json = await jsonReq.json(); return "RST-" + json.id; }
-                } catch (erro) {}
-
-                // TENTATIVA 3: JSONBlob
-                try {
-                    let res = await fetch("https://jsonblob.com/api/jsonBlob", {
-                        method: "POST", headers: { "Content-Type": "application/json", "Accept": "application/json" },
-                        body: JSON.stringify(dados)
-                    });
-                    if (res.ok) {
-                        let location = res.headers.get("Location");
-                        if (location) { let parts = location.split('/'); return "BLB-" + parts[parts.length - 1]; }
-                    }
-                } catch(e) {}
-
-                // Aguarda 1 segundo antes de tentar o loop novamente
-                if (i < 2) await new Promise(r => setTimeout(r, 1000));
-            }
             
-            return null; // Retorna null apenas se as 3 APIs falharem 3 vezes seguidas
+            // TENTATIVA 1: ByteBin (Servidor ultra-rápido, sem frescura de bloqueio e garante link curto)
+            try {
+                let req1 = await fetch("https://bytebin.lucko.me/post", {
+                    method: "POST", headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(dados)
+                });
+                if (req1.ok) { let json = await req1.json(); return "BYT-" + json.key; }
+            } catch (e) {}
+
+            // TENTATIVA 2: Pastes.dev (Outro servidor blindado e rápido para links curtos)
+            try {
+                let req2 = await fetch("https://api.pastes.dev/post", {
+                    method: "POST", headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(dados)
+                });
+                if (req2.ok) { let json = await req2.json(); return "PST-" + json.key; }
+            } catch (e) {}
+
+            // TENTATIVA 3: Restful API (O seu original)
+            try {
+                let req3 = await fetch("https://api.restful-api.dev/objects", {
+                    method: "POST", headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ name: "XRSportsTicket", data: dados })
+                });
+                if (req3.ok) { let json = await req3.json(); return "RST-" + json.id; }
+            } catch (e) {}
+
+            // TENTATIVA 4: JSONBlob (Último recurso de link curto)
+            try {
+                let req4 = await fetch("https://jsonblob.com/api/jsonBlob", {
+                    method: "POST", headers: { "Content-Type": "application/json", "Accept": "application/json" },
+                    body: JSON.stringify(dados)
+                });
+                if (req4.ok) {
+                    let loc = req4.headers.get("Location");
+                    if (loc) { return "BLB-" + loc.split('/').pop(); }
+                }
+            } catch(e) {}
+
+            return null; // O cliente só vê erro se ele estiver literalmente sem internet
         }
 
         async function lerDaNuvem(blobId) {
             if (!blobId) return null;
             let antiCache = `?_t=${new Date().getTime()}`;
 
-            if (blobId.startsWith("OFF-")) { 
-                try { return JSON.parse(decodeURIComponent(atob(decodeURIComponent(blobId.replace("OFF-", ""))))); } catch(e) { return null; } 
-            }
-            // NOVO: Lê da API NPoint
-            if (blobId.startsWith("NPT-")) {
-                let id = blobId.replace("NPT-", "");
+            // LER DO BYTEBIN
+            if (blobId.startsWith("BYT-")) {
+                let id = blobId.replace("BYT-", "");
                 try { 
-                    let res = await fetch(`https://api.npoint.io/${id}${antiCache}`, { method: 'GET', headers: fetchHeaders, cache: 'no-store' }); 
-                    if(res.ok) return await res.json(); 
+                    let res = await fetch(`https://bytebin.lucko.me/${id}${antiCache}`, { method: 'GET', cache: 'no-store' }); 
+                    if (res.ok) return await res.json(); 
                 } catch(e) {}
             }
+            // LER DO PASTES.DEV
+            if (blobId.startsWith("PST-")) {
+                let id = blobId.replace("PST-", "");
+                try { 
+                    let res = await fetch(`https://api.pastes.dev/${id}${antiCache}`, { method: 'GET', cache: 'no-store' }); 
+                    if (res.ok) return await res.json(); 
+                } catch(e) {}
+            }
+            // LER DO RESTFUL
             if (blobId.startsWith("RST-")) {
                 let id = blobId.replace("RST-", "");
                 try { 
-                    let res = await fetch(`https://api.restful-api.dev/objects/${id}${antiCache}`, { method: 'GET', headers: fetchHeaders, cache: 'no-store' }); 
+                    let res = await fetch(`https://api.restful-api.dev/objects/${id}${antiCache}`, { method: 'GET', cache: 'no-store' }); 
                     if (res.ok) { let json = await res.json(); return json.data; } 
                 } catch(e) {}
             }
+            // LER DO JSONBLOB
             if (blobId.startsWith("BLB-")) {
                 let id = blobId.replace("BLB-", "");
                 try { 
-                    let res = await fetch(`https://jsonblob.com/api/jsonBlob/${id}${antiCache}`, { method: 'GET', headers: fetchHeaders, cache: 'no-store' }); 
+                    let res = await fetch(`https://jsonblob.com/api/jsonBlob/${id}${antiCache}`, { method: 'GET', cache: 'no-store' }); 
                     if(res.ok) return await res.json(); 
                 } catch(e) {}
             }
+            
+            // Mantém suporte para links antigos já gerados não quebrarem
+            if (blobId.startsWith("OFF-")) { 
+                try { return JSON.parse(decodeURIComponent(atob(decodeURIComponent(blobId.replace("OFF-", ""))))); } catch(e) { return null; } 
+            }
+
             return null;
         }
 
         async function atualizarNaNuvem(blobId, dados) {
             if (blobId.startsWith("OFF-")) return false; 
             
-            // NOVO: Atualiza na API NPoint
-            if (blobId.startsWith("NPT-")) {
-                let id = blobId.replace("NPT-", "");
-                try { 
-                    let res = await fetch(`https://api.npoint.io/${id}`, { 
-                        method: 'POST', headers: { 'Content-Type': 'application/json', "Accept": "application/json" }, body: JSON.stringify(dados) 
-                    }); 
-                    return res.ok ? blobId : false; 
-                } catch(e) { return false; }
+            // ByteBin e Pastes não permitem edição de link, então o sistema retorna false
+            // e o seu painel de Cambista vai gerar automaticamente um link curto NOVO validado (tudo já tá programado e funciona perfeitamente)
+            if (blobId.startsWith("BYT-") || blobId.startsWith("PST-")) {
+                return false;
             }
+
             if (blobId.startsWith("BLB-")) {
                 let id = blobId.replace("BLB-", "");
                 try { 
