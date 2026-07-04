@@ -1477,7 +1477,6 @@
             let selecoesNesteJogo = carrinho.filter(c => c.idJogo === idJogo); 
             let jaSelecionado = selecoesNesteJogo.find(c => c.tipoOpcao === tipoOpcao);
 
-            let isOpcHT = tipoOpcao.includes('HT') && !tipoOpcao.includes('05HT') && !tipoOpcao.includes('15HT') && !tipoOpcao.includes('BTTS') && !tipoOpcao.includes('XHT');
             let isOpcBTTS = ['BTTSY', 'BTTSN'].includes(tipoOpcao);
             let isOpcDuplaChance = ['1X', '12', 'X2'].includes(tipoOpcao);
             
@@ -1544,19 +1543,23 @@
                     return;
                 }
 
-                let temHTNesteJogo = selecoesNesteJogo.some(c => c.tipoOpcao.includes('HT') && !c.tipoOpcao.includes('05HT') && !c.tipoOpcao.includes('15HT') && !c.tipoOpcao.includes('BTTS') && !c.tipoOpcao.includes('XHT'));
-                let outrasOpcoesNesteJogoHT = selecoesNesteJogo.filter(c => !(c.tipoOpcao.includes('HT') && !c.tipoOpcao.includes('05HT') && !c.tipoOpcao.includes('15HT') && !c.tipoOpcao.includes('BTTS') && !c.tipoOpcao.includes('XHT')));
+                // --- BLOCO CORRIGIDO: VENCEDOR 1º TEMPO ---
+                let opcoesVencedorHT = ['1HT', 'XHT', '2HT'];
+                let isOpcVencedorHT = opcoesVencedorHT.includes(tipoOpcao);
+                let temVencedorHTNesteJogo = selecoesNesteJogo.some(c => opcoesVencedorHT.includes(c.tipoOpcao));
+                let outrasOpcoesNesteJogoVencedorHT = selecoesNesteJogo.filter(c => !opcoesVencedorHT.includes(c.tipoOpcao));
 
-                if (isOpcHT && outrasOpcoesNesteJogoHT.length > 0) {
+                if (isOpcVencedorHT && outrasOpcoesNesteJogoVencedorHT.length > 0) {
                     if(navigator.vibrate) navigator.vibrate(200);
-                    mostrarToast("⚠️ Regra da Banca:<br>O mercado de 1º Tempo não pode ser combinado com outros mercados no mesmo jogo!", "erro");
+                    mostrarToast("⚠️ Regra da Banca:<br>O Vencedor 1º Tempo não pode ser combinado com outras opções no mesmo jogo!", "erro");
                     return;
                 }
-                if (!isOpcHT && temHTNesteJogo) {
+                if (!isOpcVencedorHT && temVencedorHTNesteJogo) {
                     if(navigator.vibrate) navigator.vibrate(200);
-                    mostrarToast("⚠️ Regra da Banca:<br>Você já selecionou 1º Tempo neste jogo. Ele não permite combinações!", "erro");
+                    mostrarToast("⚠️ Regra da Banca:<br>Você já selecionou o Vencedor 1º Tempo neste jogo. Ele não aceita combinações extras!", "erro");
                     return;
                 }
+                // ------------------------------------------
 
                 let temDuplaChanceNesteJogo = selecoesNesteJogo.some(c => ['1X', '12', 'X2'].includes(c.tipoOpcao));
                 let outrasOpcoesNesteJogoDC = selecoesNesteJogo.filter(c => !['1X', '12', 'X2'].includes(c.tipoOpcao));
