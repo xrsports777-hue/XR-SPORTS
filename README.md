@@ -899,40 +899,40 @@
                 }
 
                 if(s) {
-                    let placarCasa = "0"; let placarFora = "0";
-                    let temPlacar = false;
+                    let placarCasa = "?"; let placarFora = "?";
+                    let temPlacarReal = false;
                     
                     if(s.scores && s.scores.length > 0) {
-                        let objCasa = s.scores.find(x => x.name === s.home_team);
-                        let objFora = s.scores.find(x => x.name === s.away_team);
-                        placarCasa = (objCasa && objCasa.score !== null) ? objCasa.score : "0";
-                        placarFora = (objFora && objFora.score !== null) ? objFora.score : "0";
-                        temPlacar = true;
+                        // Busca flexível pelo nome para evitar divergência da API
+                        let objCasa = s.scores.find(x => s.home_team.includes(x.name) || x.name.includes(s.home_team));
+                        let objFora = s.scores.find(x => s.away_team.includes(x.name) || x.name.includes(s.away_team));
+                        if(objCasa && objCasa.score !== null) { placarCasa = objCasa.score; temPlacarReal = true; }
+                        if(objFora && objFora.score !== null) { placarFora = objFora.score; temPlacarReal = true; }
                     }
 
                     // 💥 O RELÓGIO INTELIGENTE
                     let horaDoJogo = new Date(s.commence_time);
                     let minutosPassados = (new Date() - horaDoJogo) / 60000;
 
-                    if (!temPlacar && minutosPassados > 0) {
-                        temPlacar = true;
-                    }
+                    // Display visual para não mostrar "?" enquanto a API processa
+                    let displayCasa = placarCasa !== "?" ? placarCasa : "0";
+                    let displayFora = placarFora !== "?" ? placarFora : "0";
 
                     let isFinalizadoForcado = s.completed || (minutosPassados > 135);
 
                     if(isFinalizadoForcado) {
-                        let placarFinalTxt = temPlacar ? `${placarCasa} - ${placarFora}` : "Encerrado";
+                        let placarFinalTxt = temPlacarReal ? `${displayCasa} - ${displayFora}` : "Encerrado";
                         jogo.placarFinal = `🏁 JOGO FINALIZADO: ${placarFinalTxt}`;
                         teveAlteracao = true; 
                         divPlacar.innerHTML = `<div style="color:var(--texto-secundario); font-size: 12px; font-weight: bold; margin-top: 8px; border-top: 1px dashed var(--borda); padding-top: 5px; text-align: center;">${jogo.placarFinal}</div>`;
-                    } else if (temPlacar) {
+                    } else if (temPlacarReal || minutosPassados > 0) {
                         if (dadosBilhete.s === 2 || dadosBilhete.s === 3) {
-                            divPlacar.innerHTML = `<div style="color:var(--texto-secundario); font-size: 12px; font-weight: bold; margin-top: 8px; border-top: 1px dashed var(--borda); padding-top: 5px; text-align: center;">🏁 JOGO FINALIZADO: ${placarCasa} - ${placarFora}</div>`;
+                            divPlacar.innerHTML = `<div style="color:var(--texto-secundario); font-size: 12px; font-weight: bold; margin-top: 8px; border-top: 1px dashed var(--borda); padding-top: 5px; text-align: center;">🏁 JOGO FINALIZADO: ${displayCasa} - ${displayFora}</div>`;
                         } else {
                             if (minutosPassados >= 46 && minutosPassados <= 60) {
-                                divPlacar.innerHTML = `<div style="color:var(--amarelo); font-size: 13px; font-weight: 900; margin-top: 8px; border-top: 1px dashed var(--borda); padding-top: 5px; text-align: center; animation: piscar 1.5s infinite;">⏸️ INTERVALO: ${placarCasa} - ${placarFora}</div>`;
+                                divPlacar.innerHTML = `<div style="color:var(--amarelo); font-size: 13px; font-weight: 900; margin-top: 8px; border-top: 1px dashed var(--borda); padding-top: 5px; text-align: center; animation: piscar 1.5s infinite;">⏸️ INTERVALO: ${displayCasa} - ${displayFora}</div>`;
                             } else {
-                                divPlacar.innerHTML = `<div style="color:var(--live); font-size: 13px; font-weight: 900; margin-top: 8px; border-top: 1px dashed var(--borda); padding-top: 5px; text-align: center; animation: piscar 1.5s infinite;">🔴 AO VIVO: ${placarCasa} - ${placarFora}</div>`;
+                                divPlacar.innerHTML = `<div style="color:var(--live); font-size: 13px; font-weight: 900; margin-top: 8px; border-top: 1px dashed var(--borda); padding-top: 5px; text-align: center; animation: piscar 1.5s infinite;">🔴 AO VIVO: ${displayCasa} - ${displayFora}</div>`;
                             }
                         }
                     } else {
@@ -1215,8 +1215,8 @@
                             oddF_M25 = (1/pF_M25)*0.85; oddF_N25 = (1/(1-pF_M25))*0.85;
                         }
 
-                        if (isLive && minutosCorridos > 0 && minutosCorridos <= 100) {
-                            let f = Math.max(0.02, (90 - minutosCorridos) / 90); 
+                        if (isLive && minutosCorridos > 0 && minutosCorridos <= 130) {
+                            let f = Math.max(0.01, (120 - minutosCorridos) / 120); 
                             let fUnder = Math.pow(f, 1.5); 
                             let fatorAumento = 1 + (1 - f) * 2.5;
 
@@ -1260,7 +1260,7 @@
                             if (placarFInt >= 1) { oddF_M05 = 0; oddF_N05 = 0; } else { oddF_N05 = 1.01 + (oddF_N05 - 1.01) * fUnder; oddF_M05 *= fatorAumento; }
                             if (placarFInt >= 2) { oddF_M15 = 0; oddF_N15 = 0; } else { oddF_N15 = 1.01 + (oddF_N15 - 1.01) * fUnder; oddF_M15 *= fatorAumento; }
                             if (placarFInt >= 3) { oddF_M25 = 0; oddF_N25 = 0; } else { oddF_N25 = 1.01 + (oddF_N25 - 1.01) * fUnder; oddF_M25 *= fatorAumento; }
-                        } else if (isLive && minutosCorridos > 100) {
+                        } else if (isLive && minutosCorridos > 130) {
                             oddC=0; oddE=0; oddF=0; oddM15=0; oddN15=0; oddM25=0; oddN25=0; oddBttsSim=0; oddBttsNao=0; oddCrtM25=0; oddCrtN25=0;
                             oddM05_HT=0; oddN05_HT=0; oddM15_HT=0; oddN15_HT=0; oddBttsHTSim=0; oddBttsHTNao=0;
                             oddC_M05=0; oddC_N05=0; oddC_M15=0; oddC_N15=0; oddC_M25=0; oddC_N25=0;
