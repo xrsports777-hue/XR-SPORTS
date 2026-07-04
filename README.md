@@ -273,7 +273,8 @@
             atob("MzhiNTczYWU0YzNjYzEyZGNhZjljYTM2OTY3YjU3MDk="), 
             atob("MzViN2M4NDhhMDU2ZGYxOWY0ZTBkNThmN2E0ZjMyZjc="), 
             atob("NGQyNzg2MTQzODhiNDVlYzQ5M2I5YzI4NzhiNTJjODA="), 
-            atob("MTY2N2JjNDA3MDk4NWUzMmQ0ZTljOTdjNTFjYjAyYjk=")  
+            atob("MTY2N2JjNDA3MDk4NWUzMmQ0ZTljOTdjNTFjYjAyYjk="),
+            atob("ODE4OWMwMTc1MGM2ZmExNDM4YjQzMDNmYWM3YzhiZmE=") // NOVO API KEY 
         ];
         
         let indiceChave = 0;
@@ -837,12 +838,17 @@
             }
         }
 
+        // =======================================================================
+        // 💥 O NOVO MOTOR DE BUSCA DE PLACARES NO BILHETE DIGITAL (TOTALMENTE REESCRITO)
+        // =======================================================================
         async function buscarPlacaresBilhete(ligas, dadosBilhete, blobId) {
             let placaresMap = {};
             let apiEsgotada = false;
 
             const tentarBuscar = async (liga) => {
-                let req = await fetchBlindado(`https://api.the-odds-api.com/v4/sports/${liga}/scores/?apiKey=${API_KEY}&daysFrom=1`, 5000, 1);
+                // daysFrom=3 para manter jogos velhos visíveis. _t= time para furar o cache do iPhone.
+                let urlLimpa = `https://api.the-odds-api.com/v4/sports/${liga}/scores/?apiKey=${API_KEY}&daysFrom=3&_t=` + new Date().getTime();
+                let req = await fetchBlindado(urlLimpa, 5000, 1);
                 
                 if (req.status === 401 || req.status === 429) {
                     if (trocarChaveAPI()) return await tentarBuscar(liga);
@@ -874,33 +880,69 @@
                 let divPlacar = document.getElementById(`placar-bilhete-${jogo.idJogo}-${index}`);
                 if (!divPlacar) return;
 
-                if (apiEsgotada) {
-                    divPlacar.innerHTML = `<div style="color:var(--texto-secundario); font-size: 11px; margin-top: 8px; border-top: 1px dashed var(--borda); padding-top: 5px; text-align: center;">⚠️ Limite de buscas esgotado. Atualize depois.</div>`;
+                if (apiEsgotada && Object.keys(placaresMap).length === 0) {
+                    divPlacar.innerHTML = `<div style="color:var(--texto-secundario); font-size: 11px; margin-top: 8px; border-top: 1px dashed var(--borda); padding-top: 5px; text-align: center;">⚠️ Aguardando sincronização...</div>`;
                     return;
                 }
 
-                if(placaresMap[jogo.idJogo]) {
-                    let s = placaresMap[jogo.idJogo];
+                // Busca o jogo na API pelo ID original
+                let s = placaresMap[jogo.idJogo];
+                
+                // FALLBACK INTELIGENTE: Se a API mudou o ID do jogo, ele procura pelos times!
+                if (!s) {
+                    let partes = jogo.tituloJogo.split(' x ');
+                    let casa = partes[0] ? partes[0].trim().toLowerCase() : "";
+                    let fora = partes[1] ? partes[1].trim().toLowerCase() : "";
                     
-                    let placarCasa = "0"; let placarFora = "0";
+                    s = Object.values(placaresMap).find(x => {
+                        let h = x.home_team ? x.home_team.toLowerCase() : "";
+                        let a = x.away_team ? x.away_team.toLowerCase() : "";
+                        return (h.includes(casa) || a.includes(fora)) && x.sport_key === jogo.liga;
+                    });
+                }
+
+                if(s) {
+                    let placarCasa = "?"; let placarFora = "?";
+                    let temPlacar = false;
+                    
                     if(s.scores && s.scores.length > 0) {
                         let objCasa = s.scores.find(x => x.name === s.home_team);
                         let objFora = s.scores.find(x => x.name === s.away_team);
-                        placarCasa = objCasa ? objCasa.score : s.scores[0].score;
-                        placarFora = objFora ? objFora.score : (s.scores[1] ? s.scores[1].score : "0");
+                        
+                        // Proteção caso a API mande os times, mas sem os números dos gols
+                        placarCasa = (objCasa && objCasa.score !== null) ? objCasa.score : "?";
+                        placarFora = (objFora && objFora.score !== null) ? objFora.score : "?";
+                        
+                        if (placarCasa !== "?" && placarFora !== "?") temPlacar = true;
                     }
 
                     if(s.completed) {
-                        jogo.placarFinal = `🏁 JOGO FINALIZADO: ${placarCasa} - ${placarFora}`;
+                        let placarFinalTxt = temPlacar ? `${placarCasa} - ${placarFora}` : "Encerrado";
+                        jogo.placarFinal = `🏁 JOGO FINALIZADO: ${placarFinalTxt}`;
                         teveAlteracao = true; 
                         divPlacar.innerHTML = `<div style="color:var(--texto-secundario); font-size: 12px; font-weight: bold; margin-top: 8px; border-top: 1px dashed var(--borda); padding-top: 5px; text-align: center;">${jogo.placarFinal}</div>`;
-                    } else if (s.scores && s.scores.length > 0) {
-                        divPlacar.innerHTML = `<div style="color:var(--live); font-size: 13px; font-weight: 900; margin-top: 8px; border-top: 1px dashed var(--borda); padding-top: 5px; text-align: center; animation: piscar 1.5s infinite;">🔴 AO VIVO: ${placarCasa} - ${placarFora}</div>`;
+                    } else if (temPlacar) {
+                        // O SEGREDO: Se a API está lenta dizendo que não acabou, mas o cambista JÁ FECHOU o bilhete (Deu RED ou GREEN), a gente FORÇA a tela mostrar finalizado!
+                        if (dadosBilhete.s === 2 || dadosBilhete.s === 3) {
+                            divPlacar.innerHTML = `<div style="color:var(--texto-secundario); font-size: 12px; font-weight: bold; margin-top: 8px; border-top: 1px dashed var(--borda); padding-top: 5px; text-align: center;">🏁 JOGO FINALIZADO: ${placarCasa} - ${placarFora}</div>`;
+                        } else {
+                            divPlacar.innerHTML = `<div style="color:var(--live); font-size: 13px; font-weight: 900; margin-top: 8px; border-top: 1px dashed var(--borda); padding-top: 5px; text-align: center; animation: piscar 1.5s infinite;">🔴 AO VIVO: ${placarCasa} - ${placarFora}</div>`;
+                        }
                     } else {
-                        divPlacar.innerHTML = `<div style="color:var(--texto-secundario); font-size: 11px; font-weight: bold; margin-top: 8px; border-top: 1px dashed var(--borda); padding-top: 5px; text-align: center;">AGUARDANDO INÍCIO DO JOGO...</div>`;
+                        // API sem placar ainda
+                        if (dadosBilhete.s === 2 || dadosBilhete.s === 3) {
+                            divPlacar.innerHTML = `<div style="color:var(--texto-secundario); font-size: 12px; font-weight: bold; margin-top: 8px; border-top: 1px dashed var(--borda); padding-top: 5px; text-align: center;">🏁 JOGO ENCERRADO</div>`;
+                        } else {
+                            divPlacar.innerHTML = `<div style="color:var(--texto-secundario); font-size: 11px; font-weight: bold; margin-top: 8px; border-top: 1px dashed var(--borda); padding-top: 5px; text-align: center;">AGUARDANDO INÍCIO...</div>`;
+                        }
                     }
                 } else {
-                    divPlacar.innerHTML = `<div style="color:var(--texto-secundario); font-size: 11px; margin-top: 8px; border-top: 1px dashed var(--borda); padding-top: 5px; text-align: center;">AGUARDANDO INÍCIO DO JOGO</div>`;
+                    // Jogo sumiu do radar (pode ser um jogo muito velho de dias atrás)
+                    if (dadosBilhete.s === 2 || dadosBilhete.s === 3) {
+                        divPlacar.innerHTML = `<div style="color:var(--texto-secundario); font-size: 12px; font-weight: bold; margin-top: 8px; border-top: 1px dashed var(--borda); padding-top: 5px; text-align: center;">🏁 JOGO FINALIZADO</div>`;
+                    } else {
+                        divPlacar.innerHTML = `<div style="color:var(--texto-secundario); font-size: 11px; margin-top: 8px; border-top: 1px dashed var(--borda); padding-top: 5px; text-align: center;">🔎 Aguardando Atualização...</div>`;
+                    }
                 }
             });
 
