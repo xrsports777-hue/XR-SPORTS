@@ -279,7 +279,7 @@
         let indiceChave = 0;
         let API_KEY = _0xShieldKeys[indiceChave];
         const NUMERO_WHATSAPP = "5582993729095"; 
-        const COOLDOWN_MS = 300000; 
+        const COOLDOWN_MS = 60000; // REDUZIDO PARA 1 MINUTO
 
         function permissaoParaChamarAPI() {
             const ultimoAcesso = localStorage.getItem('xrsports_firewall_timer');
@@ -1005,7 +1005,7 @@
 
                 let temLive = dadosCache.jogos.some(j => j.isLive);
                 
-                let limiteCache = temLive ? 10 : 45;
+                let limiteCache = temLive ? 1 : 15;
 
                 if (diffMinutos < limiteCache) {
                     jogosCarregados = dadosCache.jogos;
@@ -1671,6 +1671,24 @@
         function limparBilhete() { carrinho = []; document.querySelectorAll('.odd-btn').forEach(b => b.classList.remove('selecionado')); document.getElementById('input-dinheiro').value = ""; salvarCarrinho(); atualizarGaveta(); mostrarToast("Bilhete limpo com sucesso!"); }
         function abrirBilhete() { document.getElementById('modal-bilhete').style.display = 'flex'; }
         function fecharBilhete() { document.getElementById('modal-bilhete').style.display = 'none'; }
+
+        // =======================================================================
+        // ATUALIZAÇÃO AUTOMÁTICA DA TELA PRINCIPAL (PLACAR AO VIVO)
+        // =======================================================================
+        setInterval(() => {
+            // Só atualiza sozinho se estiver na tela de apostas e houver jogos ao vivo carregados
+            if (document.getElementById('tela-principal').style.display !== 'none') {
+                let temJogoAoVivo = jogosCarregados.some(j => j.isLive);
+                if (temJogoAoVivo) {
+                    let btnSync = document.getElementById('btn-sync-geral');
+                    if (!btnSync.disabled && permissaoParaChamarAPI()) {
+                        console.log("Atualizando placares ao vivo em segundo plano...");
+                        forcarAtualizacao();
+                    }
+                }
+            }
+        }, 65000); // Verifica a cada 65 segundos
+
     </script>
 </body>
 </html>
