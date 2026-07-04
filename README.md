@@ -662,28 +662,54 @@
                 let dados = await lerDaNuvem(blobId);
                 if (dados) {
                     dados.s = novoStatus;
-                    let isSuccess = await atualizarNaNuvem(blobId, dados);
-                    
+                    let isSuccess = false;
+                    let linkMudouParaNovo = false;
+
+                    // 1. Tenta atualizar no mesmo link primeiro
+                    if (!blobId.startsWith("OFF-")) {
+                        isSuccess = await atualizarNaNuvem(blobId, dados);
+                    }
+
+                    // 2. Se o servidor rejeitar a edição, cria um NOVO LINK com o resultado
                     if (!isSuccess) {
                         let novoBlobId = await salvarNaNuvem(dados);
                         if (novoBlobId) {
                             blobId = novoBlobId;
                             isSuccess = true;
+                            linkMudouParaNovo = true;
                         }
                     }
 
                     if (isSuccess) {
+                        // 3. Atualiza o painel histórico do Admin com o link correto
                         let idx = historicoBilhetes.indexOf(blobIdOriginal);
                         if (idx > -1) {
                             historicoBilhetes[idx] = blobId;
                             localStorage.setItem('xrsports_historico_links', JSON.stringify(historicoBilhetes));
                         }
 
-                        mostrarToast("Status atualizado com sucesso!");
                         carregarHistoricoAdmin();
+
+                        // 4. Se o link mudou, AVISA o cambista para mandar pro cliente
+                        if (linkMudouParaNovo) {
+                            let linkFinalValidado = window.location.href.split('?')[0] + "?b=" + blobId;
+                            try { navigator.clipboard.writeText(linkFinalValidado); } catch(e){}
+
+                            document.getElementById('modal-blindagem-texto').innerHTML = "O servidor bloqueou a edição do link antigo. O sistema gerou um <strong style='color:var(--neon);'>NOVO LINK</strong> com o resultado (Green/Red/Cancelado)!<br><br>Ele já foi <b>Copiado para o seu celular!</b><br>Envie pro cliente para ele ver o bilhete atualizado.";
+
+                            document.getElementById('btn-modal-blindagem').onclick = function() {
+                                document.getElementById('modal-blindagem').style.display = 'none';
+                                window.open(linkFinalValidado, '_blank'); // Abre o link novo para o admin ver
+                            };
+                            document.getElementById('modal-blindagem').style.display = 'flex';
+                        } else {
+                            mostrarToast("Status atualizado com sucesso no mesmo link!");
+                        }
                     } else { 
                         mostrarToast("Falha na atualização. Verifique a internet.", "erro"); 
                     }
+                } else {
+                    mostrarToast("Bilhete não encontrado no banco de dados.", "erro");
                 }
             } catch(e) {
                 mostrarToast("Erro ao processar dados da aposta.", "erro");
