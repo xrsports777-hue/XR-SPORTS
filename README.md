@@ -274,13 +274,13 @@
             atob("MzViN2M4NDhhMDU2ZGYxOWY0ZTBkNThmN2E0ZjMyZjc="), 
             atob("NGQyNzg2MTQzODhiNDVlYzQ5M2I5YzI4NzhiNTJjODA="), 
             atob("MTY2N2JjNDA3MDk4NWUzMmQ0ZTljOTdjNTFjYjAyYjk="),
-            atob("ODE4OWMwMTc1MGM2ZmExNDM4YjQzMDNmYWM3YzhiZmE=") // NOVO API KEY 
+            atob("ODE4OWMwMTc1MGM2ZmExNDM4YjQzMDNmYWM3YzhiZmE=") 
         ];
         
         let indiceChave = 0;
         let API_KEY = _0xShieldKeys[indiceChave];
         const NUMERO_WHATSAPP = "5582993729095"; 
-        const COOLDOWN_MS = 60000; // REDUZIDO PARA 1 MINUTO
+        const COOLDOWN_MS = 60000;
 
         function permissaoParaChamarAPI() {
             const ultimoAcesso = localStorage.getItem('xrsports_firewall_timer');
@@ -313,12 +313,11 @@
                     const controller = new AbortController();
                     const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
                     
-                    // Adiciona um carimbo de tempo na URL para o celular nunca reaproveitar a resposta velha
                     let urlLimpa = url + (url.includes('?') ? '&' : '?') + '_t=' + new Date().getTime();
 
                     const response = await fetch(urlLimpa, { 
                         signal: controller.signal,
-                        cache: 'no-store', // Força a buscar na rede
+                        cache: 'no-store',
                         headers: {
                             'Cache-Control': 'no-cache, no-store, must-revalidate',
                             'Pragma': 'no-cache',
@@ -839,16 +838,15 @@
         }
 
         // =======================================================================
-        // 💥 O NOVO MOTOR DE BUSCA DE PLACARES NO BILHETE DIGITAL (TOTALMENTE REESCRITO)
+        // 💥 O NOVO MOTOR DE BUSCA DE PLACARES NO BILHETE DIGITAL (TOTALMENTE REESCRITO + RELÓGIO INTELIGENTE)
         // =======================================================================
         async function buscarPlacaresBilhete(ligas, dadosBilhete, blobId) {
             let placaresMap = {};
             let apiEsgotada = false;
 
             const tentarBuscar = async (liga) => {
-                // daysFrom=3 para manter jogos velhos visíveis. _t= time para furar o cache do iPhone.
-                let urlLimpa = `https://api.the-odds-api.com/v4/sports/${liga}/scores/?apiKey=${API_KEY}&daysFrom=3&_t=` + new Date().getTime();
-                let req = await fetchBlindado(urlLimpa, 5000, 1);
+                let urlPura = `https://api.the-odds-api.com/v4/sports/${liga}/scores/?apiKey=${API_KEY}&daysFrom=3`;
+                let req = await fetchBlindado(urlPura, 5000, 1);
                 
                 if (req.status === 401 || req.status === 429) {
                     if (trocarChaveAPI()) return await tentarBuscar(liga);
@@ -885,7 +883,6 @@
                     return;
                 }
 
-                // Busca o jogo na API pelo ID original
                 let s = placaresMap[jogo.idJogo];
                 
                 // FALLBACK INTELIGENTE: Se a API mudou o ID do jogo, ele procura pelos times!
@@ -908,40 +905,47 @@
                     if(s.scores && s.scores.length > 0) {
                         let objCasa = s.scores.find(x => x.name === s.home_team);
                         let objFora = s.scores.find(x => x.name === s.away_team);
-                        
-                        // Proteção caso a API mande os times, mas sem os números dos gols
                         placarCasa = (objCasa && objCasa.score !== null) ? objCasa.score : "?";
                         placarFora = (objFora && objFora.score !== null) ? objFora.score : "?";
-                        
                         if (placarCasa !== "?" && placarFora !== "?") temPlacar = true;
                     }
 
-                    if(s.completed) {
+                    // 💥 O RELÓGIO INTELIGENTE: Ignora a API se já passou muito tempo do início
+                    let horaDoJogo = new Date(s.commence_time);
+                    let minutosPassados = (new Date() - horaDoJogo) / 60000;
+                    let isFinalizadoForcado = s.completed || (minutosPassados > 135);
+
+                    if(isFinalizadoForcado) {
                         let placarFinalTxt = temPlacar ? `${placarCasa} - ${placarFora}` : "Encerrado";
                         jogo.placarFinal = `🏁 JOGO FINALIZADO: ${placarFinalTxt}`;
                         teveAlteracao = true; 
                         divPlacar.innerHTML = `<div style="color:var(--texto-secundario); font-size: 12px; font-weight: bold; margin-top: 8px; border-top: 1px dashed var(--borda); padding-top: 5px; text-align: center;">${jogo.placarFinal}</div>`;
                     } else if (temPlacar) {
-                        // O SEGREDO: Se a API está lenta dizendo que não acabou, mas o cambista JÁ FECHOU o bilhete (Deu RED ou GREEN), a gente FORÇA a tela mostrar finalizado!
                         if (dadosBilhete.s === 2 || dadosBilhete.s === 3) {
                             divPlacar.innerHTML = `<div style="color:var(--texto-secundario); font-size: 12px; font-weight: bold; margin-top: 8px; border-top: 1px dashed var(--borda); padding-top: 5px; text-align: center;">🏁 JOGO FINALIZADO: ${placarCasa} - ${placarFora}</div>`;
                         } else {
-                            divPlacar.innerHTML = `<div style="color:var(--live); font-size: 13px; font-weight: 900; margin-top: 8px; border-top: 1px dashed var(--borda); padding-top: 5px; text-align: center; animation: piscar 1.5s infinite;">🔴 AO VIVO: ${placarCasa} - ${placarFora}</div>`;
+                            if (minutosPassados >= 46 && minutosPassados <= 60) {
+                                divPlacar.innerHTML = `<div style="color:var(--amarelo); font-size: 13px; font-weight: 900; margin-top: 8px; border-top: 1px dashed var(--borda); padding-top: 5px; text-align: center; animation: piscar 1.5s infinite;">⏸️ INTERVALO: ${placarCasa} - ${placarFora}</div>`;
+                            } else {
+                                divPlacar.innerHTML = `<div style="color:var(--live); font-size: 13px; font-weight: 900; margin-top: 8px; border-top: 1px dashed var(--borda); padding-top: 5px; text-align: center; animation: piscar 1.5s infinite;">🔴 AO VIVO: ${placarCasa} - ${placarFora}</div>`;
+                            }
                         }
                     } else {
-                        // API sem placar ainda
                         if (dadosBilhete.s === 2 || dadosBilhete.s === 3) {
                             divPlacar.innerHTML = `<div style="color:var(--texto-secundario); font-size: 12px; font-weight: bold; margin-top: 8px; border-top: 1px dashed var(--borda); padding-top: 5px; text-align: center;">🏁 JOGO ENCERRADO</div>`;
                         } else {
-                            divPlacar.innerHTML = `<div style="color:var(--texto-secundario); font-size: 11px; font-weight: bold; margin-top: 8px; border-top: 1px dashed var(--borda); padding-top: 5px; text-align: center;">AGUARDANDO INÍCIO...</div>`;
+                            if (minutosPassados > 0) {
+                                divPlacar.innerHTML = `<div style="color:var(--texto-secundario); font-size: 11px; font-weight: bold; margin-top: 8px; border-top: 1px dashed var(--borda); padding-top: 5px; text-align: center;">🔎 Processando Placar...</div>`;
+                            } else {
+                                divPlacar.innerHTML = `<div style="color:var(--texto-secundario); font-size: 11px; font-weight: bold; margin-top: 8px; border-top: 1px dashed var(--borda); padding-top: 5px; text-align: center;">AGUARDANDO INÍCIO...</div>`;
+                            }
                         }
                     }
                 } else {
-                    // Jogo sumiu do radar (pode ser um jogo muito velho de dias atrás)
                     if (dadosBilhete.s === 2 || dadosBilhete.s === 3) {
                         divPlacar.innerHTML = `<div style="color:var(--texto-secundario); font-size: 12px; font-weight: bold; margin-top: 8px; border-top: 1px dashed var(--borda); padding-top: 5px; text-align: center;">🏁 JOGO FINALIZADO</div>`;
                     } else {
-                        divPlacar.innerHTML = `<div style="color:var(--texto-secundario); font-size: 11px; margin-top: 8px; border-top: 1px dashed var(--borda); padding-top: 5px; text-align: center;">🔎 Aguardando Atualização...</div>`;
+                        divPlacar.innerHTML = `<div style="color:var(--texto-secundario); font-size: 11px; margin-top: 8px; border-top: 1px dashed var(--borda); padding-top: 5px; text-align: center;">🔎 Aguardando Atualização da API...</div>`;
                     }
                 }
             });
@@ -1006,9 +1010,6 @@
             document.getElementById('tela-digital').style.opacity = '1';
             esconderLoading();
 
-            // =======================================================================
-            // 💥 CORREÇÃO: LIBERA BUSCA DE PLACAR MESMO SE O STATUS FOR 0 (PENDENTE)
-            // =======================================================================
             if(ligasBilhete.length > 0 && precisaBuscarAoVivo && dados.s >= 0 && dados.s <= 3) {
                 buscarPlacaresBilhete(ligasBilhete, dados, blobId);
                 setInterval(() => buscarPlacaresBilhete(ligasBilhete, dados, blobId), 60000);
@@ -1040,16 +1041,9 @@
             mostrarToast("Buscando dados mais recentes...");
         }
 
-        // =======================================================================
-        // 🔒 SISTEMA DE CLAMP ROBUSTO (AJUSTE FINO DE MARGEM DA BANCA)
-        // Substitui o antigo '* 0.85' linear que vazava odds altas
-        // =======================================================================
         const clampOdd = (val) => {
             if (!val || val <= 1.01) return 0;
-            // Curva Exponencial: Corta odds muito altas de forma agressiva (protege contra zebras superpagas)
-            // mas preserva melhor as odds baixas (para manter o jogo atrativo no favorito).
             let novaOdd = Math.pow(val, 0.92) * 0.95;
-            // Teto máximo de odd permitida em aposta única e chão de 1.02
             return Math.min(30.00, Math.max(1.02, novaOdd));
         };
 
@@ -1195,14 +1189,10 @@
                         let probM25Cartoes = 0.70 + (Math.random() * 0.1); 
                         oddCrtM25 = (1 / probM25Cartoes) * 0.85; oddCrtN25 = (1 / (1 - probM25Cartoes)) * 0.85;
 
-                        // ==========================================
-                        // AJUSTE CORRIGIDO: MERCADO DE GOLS POR TIME
-                        // ==========================================
                         if(oddC > 0 && oddF > 0 && oddM25 > 0) {
                             let pC = 1/oddC; let pF = 1/oddF; let pTot = pC + pF;
                             let pesoC = pC/pTot; let pesoF = pF/pTot;
                             
-                            // Ajuste rígido na probabilidade para não inflar a cotação
                             let pC_M05 = Math.min(0.92, 0.50 + (pesoC * 0.6));
                             let pC_M15 = Math.min(0.75, 0.10 + (pesoC * 0.8));
                             let pC_M25 = Math.min(0.45, 0.02 + (pesoC * 0.4));
@@ -1223,7 +1213,6 @@
                         if (isLive && minutosCorridos > 0 && minutosCorridos <= 100) {
                             let f = Math.max(0.02, (90 - minutosCorridos) / 90); 
                             let fUnder = Math.pow(f, 1.5); 
-                            // Fator de aumento reduzido (max 2.5x em vez de 4x) para blindar a banca no final do jogo
                             let fatorAumento = 1 + (1 - f) * 2.5;
 
                             if (placarCInt > placarFInt) { 
@@ -1275,15 +1264,11 @@
                             oddVTG_CM25=0; oddVTG_EM25=0; oddVTG_FM25=0; oddVTG_CN25=0; oddVTG_EN25=0; oddVTG_FN25=0;
                         }
 
-                        // ==========================================
-                        // BASE MATH DOS MERCADOS ALTERNATIVOS
-                        // ==========================================
                         if(oddC > 0 && oddE > 0 && oddF > 0) {
                             let probC = 1 / oddC, probE = 1 / oddE, probF = 1 / oddF;
                             odd1X = (1 / (probC + probE)) * 0.88; odd12 = (1 / (probC + probF)) * 0.88; oddX2 = (1 / (probF + probE)) * 0.88;
                             oddDnbCasa = (1 / (probC / (probC + probF))) * 0.88; oddDnbFora = (1 / (probF / (probC + probF))) * 0.88;
                             
-                            // Correção de Multiplicadores HT (Mais precisos para a realidade do 1º Tempo)
                             if(minutosCorridos <= 45) { 
                                 oddC_HT = oddC < 2.0 ? oddC * 1.40 : oddC * 1.10; 
                                 oddF_HT = oddF < 2.0 ? oddF * 1.40 : oddF * 1.10; 
@@ -1295,7 +1280,6 @@
                                 oddX2_HT = (1 / (probF_HT + probE_HT)) * 0.88;
                             }
 
-                            // Vencedor e Ambas Marcam (Margem Rígida de 0.80)
                             if(oddBttsSim > 0 && oddBttsNao > 0) {
                                 let probBttsY = 1 / oddBttsSim, probBttsN = 1 / oddBttsNao;
                                 oddVam_CS = (1 / (probC * probBttsY)) * 0.80;
@@ -1307,7 +1291,6 @@
                                 oddVam_FN = (1 / (probF * probBttsN)) * 0.80;
                             }
 
-                            // Vencedor e Mais/Menos de 2.5 (Margem Rígida de 0.80)
                             if(oddM25 > 0 && oddN25 > 0) {
                                 let probM25 = 1 / oddM25, probN25 = 1 / oddN25;
                                 oddVTG_CM25 = (1 / (probC * probM25)) * 0.80;
@@ -1320,7 +1303,6 @@
                             }
                         }
 
-                        // Aplica a Blindagem Exponencial em todas as Odds
                         odd1X = clampOdd(odd1X); odd12 = clampOdd(odd12); oddX2 = clampOdd(oddX2);
                         odd1X_HT = clampOdd(odd1X_HT); odd12_HT = clampOdd(odd12_HT); oddX2_HT = clampOdd(oddX2_HT);
                         oddDnbCasa = clampOdd(oddDnbCasa); oddDnbFora = clampOdd(oddDnbFora);
@@ -1604,7 +1586,6 @@
                     return;
                 }
 
-                // --- BLOCO CORRIGIDO: VENCEDOR 1º TEMPO ---
                 let opcoesVencedorHT = ['1HT', 'XHT', '2HT'];
                 let isOpcVencedorHT = opcoesVencedorHT.includes(tipoOpcao);
                 let temVencedorHTNesteJogo = selecoesNesteJogo.some(c => opcoesVencedorHT.includes(c.tipoOpcao));
@@ -1620,7 +1601,6 @@
                     mostrarToast("⚠️ Regra da Banca:<br>Você já selecionou o Vencedor 1º Tempo neste jogo. Ele não aceita combinações extras!", "erro");
                     return;
                 }
-                // ------------------------------------------
 
                 let temDuplaChanceNesteJogo = selecoesNesteJogo.some(c => ['1X', '12', 'X2'].includes(c.tipoOpcao));
                 let outrasOpcoesNesteJogoDC = selecoesNesteJogo.filter(c => !['1X', '12', 'X2'].includes(c.tipoOpcao));
