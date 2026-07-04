@@ -8,9 +8,12 @@
     <meta http-equiv="Expires" content="0">
     <title>XR SPORTS - A Banca Premium</title>
     <style>
-        /* BLINDAGEM CSS */
+        /* BLINDAGEM EXTRA CSS: Impede seleção e cópia de texto na página inteira */
         * { box-sizing:border-box; margin:0; padding:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif; -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none; }
+        
         :root{--bg-fundo:#090e17;--bg-card:rgba(18,25,39,0.6);--bg-hover:#1a2333;--neon:#00ff88;--texto:#ffffff;--texto-secundario:#8a96a8;--borda:rgba(255,255,255,0.1);--danger:#ff4757;--live:#ff3b3b;--amarelo:#f5a623;--azul:#00c3ff}body{background-color:var(--bg-fundo);color:var(--texto);padding-bottom:120px;-webkit-font-smoothing:antialiased}header{background:#121927;padding:16px 20px;position:sticky;top:0;z-index:50;border-bottom:1px solid var(--borda);box-shadow:0 4px 20px rgba(0,0,0,0.4)}.header-top{display:flex;justify-content:space-between;align-items:center}
+        
+        /* LOGO PREMIUM XR SPORTS */
         .logo-wrapper { display: flex; align-items: center; gap: 12px; cursor: pointer; user-select: none; text-decoration: none; }
         .logo-badge { position: relative; width: 38px; height: 38px; background: linear-gradient(135deg, #121927 0%, #090e17 100%); border-radius: 10px; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(0, 255, 136, 0.4); box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5), 0 0 15px rgba(0, 255, 136, 0.15); overflow: hidden; transition: transform 0.2s; }
         .logo-wrapper:active .logo-badge { transform: scale(0.95); }
@@ -21,12 +24,16 @@
         .logo-title { font-size: 20px; font-weight: 900; color: #ffffff; letter-spacing: 0.5px; line-height: 1.1; display: flex; align-items: center; }
         .logo-title strong { color: var(--neon); margin-right: 4px; font-style: italic; }
         .logo-subtitle { font-size: 9px; font-weight: 900; color: var(--neon); letter-spacing: 3.5px; text-transform: uppercase; margin-top: 2px; }
-        .btn-sync{background:0 0;color:var(--texto-secundario);border:1px solid var(--borda);padding:6px 12px;border-radius:8px;font-weight:700;cursor:pointer;transition:.2s;font-size:13px}.btn-sync:active{transform:scale(.95);background:var(--bg-hover)}.btn-sync:disabled{opacity:0.5;cursor:not-allowed}.nav-ligas{display:flex;gap:10px;margin-top:18px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}.nav-ligas::-webkit-scrollbar{display:none}.liga-btn{background:rgba(9,14,23,0.8);color:var(--texto-secundario);border:1px solid var(--borda);padding:8px 18px;border-radius:20px;font-size:13px;font-weight:700;white-space:nowrap;cursor:pointer;transition:.3s}.liga-btn.ativo{background:var(--neon);color:#000;border-color:var(--neon)}#status-msg{text-align:center;padding:25px 20px;color:var(--texto-secundario);font-size:14px;margin:20px 15px;border-radius:12px;background:var(--bg-card);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px dashed var(--borda);line-height:1.6}.container{padding:5px 15px;max-width:600px;margin:0 auto}.card-jogo{background:var(--bg-card);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid var(--borda);border-radius:16px;padding:16px;margin-bottom:16px;display:flex;flex-direction:column;gap:14px;box-shadow:0 8px 32px rgba(0,0,0,0.2)}.card-topo{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--borda);padding-bottom:10px}.liga-tag{font-size:11px;color:var(--texto-secundario);font-weight:800;text-transform:uppercase;letter-spacing:.5px}.badge-horario{font-size:11px;font-weight:800;color:#000;background:var(--neon);padding:4px 8px;border-radius:6px}.badge-aovivo{background:rgba(255,59,59,0.15);color:var(--live);border:1px solid var(--live);animation:piscar 1.5s infinite}.badge-intervalo{background:rgba(245,166,35,0.15);color:var(--amarelo);border:1px solid var(--amarelo);animation:piscar 1.5s infinite}@keyframes piscar{0%,100%{opacity:1}50%{opacity:.5}}.placar-box{display:flex;justify-content:space-between;align-items:center;width:100%;margin-top:5px}.time-box{display:flex;align-items:center;gap:10px;width:40%}.time-box.visitante{flex-direction:row-reverse;text-align:right}.escudo-container{width:36px;height:36px;display:flex;align-items:center;justify-content:center;flex-shrink:0}.escudo-img{width:100%;height:100%;object-fit:contain; pointer-events:none;}.escudo-letra{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:13px;color:#fff;box-shadow:inset 0 2px 5px rgba(0,0,0,0.4);border:1px solid rgba(255,255,255,0.1)}.nome-time{font-size:14px;font-weight:800;color:var(--texto);line-height:1.2}.vs-txt{font-size:12px;font-weight:900;color:var(--texto-secundario)}.placar-live{font-size:16px;font-weight:900;color:var(--neon);background:rgba(0,255,136,0.1);padding:4px 8px;border-radius:6px;letter-spacing:1px;white-space:nowrap}.mercado-titulo{font-size:11px;color:var(--texto-secundario);font-weight:700;text-transform:uppercase;margin-bottom:-5px;margin-top:5px;text-align:center;border-top:1px dashed rgba(255,255,255,0.05);padding-top:10px}.odds-linha{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}.odds-linha-dupla{display:grid;grid-template-columns:1fr 1fr;gap:8px}.odd-btn{background:rgba(9,14,23,0.6);border:1px solid var(--borda);border-radius:10px;padding:10px 5px;display:flex;flex-direction:column;align-items:center;cursor:pointer;transition:.2s;user-select:none}.odd-lbl{font-size:10px;color:var(--texto-secundario);font-weight:800;text-transform:uppercase;margin-bottom:2px;text-align:center}.odd-val{font-size:15px;font-weight:900;color:var(--texto)}#btn-gaveta{position:fixed;bottom:25px;left:50%;transform:translateX(-50%);background:var(--neon);color:#000;width:90%;max-width:400px;padding:16px 20px;border-radius:14px;font-weight:900;font-size:15px;display:none;justify-content:space-between;align-items:center;box-shadow:0 10px 30px rgba(0,255,136,0.3);z-index:90;cursor:pointer;border:none}.badge-qtd{background:#000;color:var(--neon);width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px}#modal-bilhete{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);z-index:100;display:none;flex-direction:column;justify-content:flex-end;backdrop-filter:blur(5px)}.bilhete-conteudo{background:rgba(18,25,39,0.85);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid var(--borda);width:100%;max-height:85vh;border-top-left-radius:24px;border-top-right-radius:24px;padding:24px;display:flex;flex-direction:column;animation:subirTela .3s ease-out forwards}@keyframes subirTela{from{transform:translateY(100%)}to{transform:translateY(0)}}.bilhete-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;border-bottom:1px solid var(--borda);padding-bottom:15px}.bilhete-titulo{font-size:20px;font-weight:900}.btn-fechar{background:rgba(9,14,23,0.8);border:1px solid var(--borda);color:var(--texto);width:36px;height:36px;border-radius:50%;font-weight:700;cursor:pointer}.lista-palpites{overflow-y:auto;max-height:35vh;margin-bottom:15px;padding-right:5px}.palpite-item{background:rgba(9,14,23,0.6);padding:14px;border-radius:12px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;border:1px solid var(--borda);border-left:4px solid var(--neon)}.palpite-jogo{font-size:12px;color:var(--texto-secundario);font-weight:700;margin-bottom:5px}.palpite-escolha{font-size:15px;font-weight:900}.palpite-odd{font-weight:900;color:var(--neon);font-size:18px}.caixa-valores{background:rgba(5,8,12,0.8);padding:18px;border-radius:16px;border:1px solid var(--borda);margin-bottom:15px}.linha-valor{display:flex;justify-content:space-between;margin-bottom:12px;font-size:14px;font-weight:700;color:var(--texto-secundario)}.odd-final{color:var(--texto);font-size:18px;font-weight:900}.input-grana{width:100%;background:rgba(18,25,39,0.6);border:2px solid var(--borda);color:#fff;padding:16px;border-radius:12px;font-size:20px;font-weight:900;text-align:center;outline:0;margin-bottom:10px; user-select: text;}.input-grana:focus{border-color:var(--neon)}.linha-retorno{display:flex;justify-content:space-between;align-items:center;margin-top:15px;font-weight:800}.retorno-verde{color:var(--neon);font-size:24px;font-weight:900}.btn-enviar-zap{width:100%;background:#25D366;color:#fff;padding:18px;border:none;border-radius:14px;font-weight:900;font-size:16px;cursor:pointer;text-transform:uppercase;margin-top:5px;box-shadow:0 4px 15px rgba(37,211,102,0.3)}.btn-apagar-tudo{background:0 0;border:none;color:var(--danger);font-size:13px;font-weight:700;margin-top:20px;width:100%;cursor:pointer;text-decoration:underline}.botao-fantasma{position:fixed;bottom:0;right:0;width:60px;height:60px;background:0 0;z-index:9999;cursor:default}#tela-login,#tela-admin{display:none;padding:25px;max-width:500px;margin:40px auto;background:rgba(18,25,39,0.7);backdrop-filter:blur(15px);border:1px solid var(--borda);border-radius:16px;box-shadow:0 10px 40px rgba(0,0,0,0.5)}.input-admin{width:100%;padding:16px;margin-bottom:15px;background:rgba(9,14,23,0.8);border:1px solid var(--borda);color:#fff;border-radius:8px;font-size:16px; user-select: text;}.btn-admin{width:100%;background:var(--neon);color:#000;padding:18px;border:none;border-radius:8px;font-weight:900;cursor:pointer;margin-bottom:10px;font-size:16px}.btn-voltar{background:0 0;color:var(--texto-secundario);border:1px solid var(--borda)}#tela-digital{display:none;padding:20px;max-width:500px;margin:0 auto; opacity:0; transition: opacity 0.4s ease;}.digital-card{background:rgba(18,25,39,0.7);backdrop-filter:blur(15px);border:1px solid var(--borda);border-radius:16px;padding:20px;margin-top:20px;box-shadow:0 10px 30px rgba(0,0,0,0.5)}.digital-header{text-align:center;border-bottom:2px dashed var(--borda);padding-bottom:15px;margin-bottom:15px}.digital-pin{font-size:28px;font-weight:900;color:var(--texto);letter-spacing:2px}.digital-status{display:inline-block;padding:6px 14px;border-radius:20px;font-size:13px;font-weight:900;margin-top:10px;border:1px solid transparent}
+        
+        .btn-sync{background:0 0;color:var(--texto-secundario);border:1px solid var(--borda);padding:6px 12px;border-radius:8px;font-weight:700;cursor:pointer;transition:.2s;font-size:13px}.btn-sync:active{transform:scale(.95);background:var(--bg-hover)}.btn-sync:disabled{opacity:0.5;cursor:not-allowed}.nav-ligas{display:flex;gap:10px;margin-top:18px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}.nav-ligas::-webkit-scrollbar{display:none}.liga-btn{background:rgba(9,14,23,0.8);color:var(--texto-secundario);border:1px solid var(--borda);padding:8px 18px;border-radius:20px;font-size:13px;font-weight:700;white-space:nowrap;cursor:pointer;transition:.3s}.liga-btn.ativo{background:var(--neon);color:#000;border-color:var(--neon)}#status-msg{text-align:center;padding:25px 20px;color:var(--texto-secundario);font-size:14px;margin:20px 15px;border-radius:12px;background:var(--bg-card);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px dashed var(--borda);line-height:1.6}.container{padding:5px 15px;max-width:600px;margin:0 auto}.card-jogo{background:var(--bg-card);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid var(--borda);border-radius:16px;padding:16px;margin-bottom:16px;display:flex;flex-direction:column;gap:14px;box-shadow:0 8px 32px rgba(0,0,0,0.2)}.card-topo{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--borda);padding-bottom:10px}.liga-tag{font-size:11px;color:var(--texto-secundario);font-weight:800;text-transform:uppercase;letter-spacing:.5px}.badge-horario{font-size:11px;font-weight:800;color:#000;background:var(--neon);padding:4px 8px;border-radius:6px}.badge-aovivo{background:rgba(255,59,59,0.15);color:var(--live);border:1px solid var(--live);animation:piscar 1.5s infinite}.badge-intervalo{background:rgba(245,166,35,0.15);color:var(--amarelo);border:1px solid var(--amarelo);animation:piscar 1.5s infinite}@keyframes piscar{0%,100%{opacity:1}50%{opacity:.5}}.placar-box{display:flex;justify-content:space-between;align-items:center;width:100%;margin-top:5px}.time-box{display:flex;align-items:center;gap:10px;width:40%}.time-box.visitante{flex-direction:row-reverse;text-align:right}.escudo-container{width:36px;height:36px;display:flex;align-items:center;justify-content:center;flex-shrink:0}.escudo-img{width:100%;height:100%;object-fit:contain; pointer-events:none;}.escudo-letra{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:13px;color:#fff;box-shadow:inset 0 2px 5px rgba(0,0,0,0.4);border:1px solid rgba(255,255,255,0.1)}.nome-time{font-size:14px;font-weight:800;color:var(--texto);line-height:1.2}.vs-txt{font-size:12px;font-weight:900;color:var(--texto-secundario)}.placar-live{font-size:16px;font-weight:900;color:var(--neon);background:rgba(0,255,136,0.1);padding:4px 8px;border-radius:6px;letter-spacing:1px;white-space:nowrap}.mercado-titulo{font-size:11px;color:var(--texto-secundario);font-weight:700;text-transform:uppercase;margin-bottom:-5px;margin-top:5px;text-align:center;border-top:1px dashed rgba(255,255,255,0.05);padding-top:10px}.odds-linha{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}.odds-linha-dupla{display:grid;grid-template-columns:1fr 1fr;gap:8px}.odd-btn{background:rgba(9,14,23,0.6);border:1px solid var(--borda);border-radius:10px;padding:10px 5px;display:flex;flex-direction:column;align-items:center;cursor:pointer;transition:.2s;user-select:none}.odd-lbl{font-size:10px;color:var(--texto-secundario);font-weight:800;text-transform:uppercase;margin-bottom:2px;text-align:center}.odd-val{font-size:15px;font-weight:900;color:var(--texto)}#btn-gaveta{position:fixed;bottom:25px;left:50%;transform:translateX(-50%);background:var(--neon);color:#000;width:90%;max-width:400px;padding:16px 20px;border-radius:14px;font-weight:900;font-size:15px;display:none;justify-content:space-between;align-items:center;box-shadow:0 10px 30px rgba(0,255,136,0.3);z-index:90;cursor:pointer;border:none}.badge-qtd{background:#000;color:var(--neon);width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px}#modal-bilhete{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);z-index:100;display:none;flex-direction:column;justify-content:flex-end;backdrop-filter:blur(5px)}.bilhete-conteudo{background:rgba(18,25,39,0.85);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid var(--borda);width:100%;max-height:85vh;border-top-left-radius:24px;border-top-right-radius:24px;padding:24px;display:flex;flex-direction:column;animation:subirTela .3s ease-out forwards}@keyframes subirTela{from{transform:translateY(100%)}to{transform:translateY(0)}}.bilhete-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;border-bottom:1px solid var(--borda);padding-bottom:15px}.bilhete-titulo{font-size:20px;font-weight:900}.btn-fechar{background:rgba(9,14,23,0.8);border:1px solid var(--borda);color:var(--texto);width:36px;height:36px;border-radius:50%;font-weight:700;cursor:pointer}.lista-palpites{overflow-y:auto;max-height:35vh;margin-bottom:15px;padding-right:5px}.palpite-item{background:rgba(9,14,23,0.6);padding:14px;border-radius:12px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;border:1px solid var(--borda);border-left:4px solid var(--neon)}.palpite-jogo{font-size:12px;color:var(--texto-secundario);font-weight:700;margin-bottom:5px}.palpite-escolha{font-size:15px;font-weight:900}.palpite-odd{font-weight:900;color:var(--neon);font-size:18px}.caixa-valores{background:rgba(5,8,12,0.8);padding:18px;border-radius:16px;border:1px solid var(--borda);margin-bottom:15px}.linha-valor{display:flex;justify-content:space-between;margin-bottom:12px;font-size:14px;font-weight:700;color:var(--texto-secundario)}.odd-final{color:var(--texto);font-size:18px;font-weight:900}.input-grana{width:100%;background:rgba(18,25,39,0.6);border:2px solid var(--borda);color:#fff;padding:16px;border-radius:12px;font-size:20px;font-weight:900;text-align:center;outline:0;margin-bottom:10px; user-select: text; /* Libera digitação apenas aqui */ }.input-grana:focus{border-color:var(--neon)}.linha-retorno{display:flex;justify-content:space-between;align-items:center;margin-top:15px;font-weight:800}.retorno-verde{color:var(--neon);font-size:24px;font-weight:900}.btn-enviar-zap{width:100%;background:#25D366;color:#fff;padding:18px;border:none;border-radius:14px;font-weight:900;font-size:16px;cursor:pointer;text-transform:uppercase;margin-top:5px;box-shadow:0 4px 15px rgba(37,211,102,0.3)}.btn-apagar-tudo{background:0 0;border:none;color:var(--danger);font-size:13px;font-weight:700;margin-top:20px;width:100%;cursor:pointer;text-decoration:underline}.botao-fantasma{position:fixed;bottom:0;right:0;width:60px;height:60px;background:0 0;z-index:9999;cursor:default}#tela-login,#tela-admin{display:none;padding:25px;max-width:500px;margin:40px auto;background:rgba(18,25,39,0.7);backdrop-filter:blur(15px);border:1px solid var(--borda);border-radius:16px;box-shadow:0 10px 40px rgba(0,0,0,0.5)}.input-admin{width:100%;padding:16px;margin-bottom:15px;background:rgba(9,14,23,0.8);border:1px solid var(--borda);color:#fff;border-radius:8px;font-size:16px; user-select: text;}.btn-admin{width:100%;background:var(--neon);color:#000;padding:18px;border:none;border-radius:8px;font-weight:900;cursor:pointer;margin-bottom:10px;font-size:16px}.btn-voltar{background:0 0;color:var(--texto-secundario);border:1px solid var(--borda)}#tela-digital{display:none;padding:20px;max-width:500px;margin:0 auto; opacity:0; transition: opacity 0.4s ease;}.digital-card{background:rgba(18,25,39,0.7);backdrop-filter:blur(15px);border:1px solid var(--borda);border-radius:16px;padding:20px;margin-top:20px;box-shadow:0 10px 30px rgba(0,0,0,0.5)}.digital-header{text-align:center;border-bottom:2px dashed var(--borda);padding-bottom:15px;margin-bottom:15px}.digital-pin{font-size:28px;font-weight:900;color:var(--texto);letter-spacing:2px}.digital-status{display:inline-block;padding:6px 14px;border-radius:20px;font-size:13px;font-weight:900;margin-top:10px;border:1px solid transparent}
+        
+        /* CORES DOS STATUS */
         .status-0{background:rgba(245,166,35,0.15);color:var(--amarelo);border-color:var(--amarelo)}
         .status-1{background:rgba(0,255,136,0.15);color:var(--neon);border-color:var(--neon);box-shadow:0 0 15px rgba(0,255,136,0.2)}
         .status-2{background:rgba(0,255,136,0.25);color:var(--neon);border-color:var(--neon);box-shadow:0 0 20px rgba(0,255,136,0.4)}
         .status-3{background:rgba(255,71,87,0.15);color:var(--danger);border-color:var(--danger)}
         .status-4{background:rgba(138,150,168,0.15);color:var(--texto-secundario);border-color:var(--texto-secundario)}
+
         .digital-cliente{font-size:14px;color:var(--texto-secundario);margin-top:10px}.btn-voltar-home{width:100%;background:rgba(26,35,51,0.8);color:var(--texto);padding:15px;border:1px solid var(--borda);border-radius:12px;font-weight:700;cursor:pointer;margin-top:10px;transition:.2s}.btn-voltar-home:hover{background:rgba(26,35,51,1)}
         #toast-container{position:fixed;top:20px;right:20px;z-index:10000;display:flex;flex-direction:column;gap:10px;pointer-events:none}.toast{background:rgba(18,25,39,0.95);backdrop-filter:blur(10px);border-left:4px solid var(--neon);color:var(--texto);padding:16px 24px;border-radius:8px;font-weight:700;font-size:14px;box-shadow:0 4px 20px rgba(0,0,0,0.6);animation:deslizarIn .3s ease-out forwards;pointer-events:auto}.toast.erro{border-color:var(--danger)}@keyframes deslizarIn{from{transform:translateX(120%);opacity:0}to{transform:translateX(0);opacity:1}}@keyframes deslizarOut{from{transform:translateX(0);opacity:1}to{transform:translateX(120%);opacity:0}}
         .termos-rodape { margin-top: 30px; padding: 20px 15px; background: rgba(9, 14, 23, 0.4); border-top: 1px dashed var(--borda); font-size: 11px; color: var(--texto-secundario); line-height: 1.6; }
@@ -43,17 +50,21 @@
         .btn-mini.green { background: var(--neon); color: #000; }
         .btn-mini.red { background: var(--danger); color: #fff; }
         .btn-mini.cancelar { background: rgba(138,150,168,0.2); color: #8a96a8; border: 1px solid #8a96a8; }
+        
         #overlay-loading { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-fundo); z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--neon); font-weight: 900; font-size: 18px; display: none; }
         .spinner { border: 4px solid rgba(255,255,255,0.1); border-top: 4px solid var(--neon); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin-bottom: 15px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
         .busca-bilhete-box { display: flex; gap: 8px; margin: 15px auto 5px auto; max-width: 600px; padding: 0 15px; }
         .busca-bilhete-box input { flex: 1; background: rgba(9,14,23,0.8); border: 1px solid var(--borda); color: #fff; padding: 14px 15px; border-radius: 12px; font-size: 14px; outline: none; transition: 0.2s; box-shadow: inset 0 2px 4px rgba(0,0,0,0.2); user-select: text;}
         .busca-bilhete-box input:focus { border-color: var(--neon); }
         .busca-bilhete-box button { background: var(--neon); color: #000; border: none; padding: 0 20px; border-radius: 12px; font-weight: 900; font-size: 13px; cursor: pointer; transition: 0.2s; }
         .busca-bilhete-box button:active { transform: scale(0.95); }
+
         .odd-btn:active { transform: scale(0.92); }
         .odd-btn.selecionado { background:var(--neon);border-color:var(--neon);box-shadow:0 0 15px rgba(0,255,136,0.2); transform: scale(1.03); transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         .odd-btn.selecionado .odd-lbl,.odd-btn.selecionado .odd-val{color:#000}
+
         #gaveta-qtd { animation: pulseSelo 2s infinite; }
         @keyframes pulseSelo { 0% { box-shadow: 0 0 0 0 rgba(0, 255, 136, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(0, 255, 136, 0); } 100% { box-shadow: 0 0 0 0 rgba(0, 255, 136, 0); } }
         @keyframes fadeIn { from { opacity: 0; transform: scale(0.8); } to { opacity: 1; transform: scale(1); } }
@@ -209,9 +220,8 @@
 
     <script>
         // =======================================================================
-        // LÓGICA JAVASCRIPT EXPANDIDA (FÁCIL LEITURA)
+        // 🧹 EXTERMINADOR DE CACHE: Garante que você veja a versão imediatamente
         // =======================================================================
-
         try {
             Object.keys(localStorage).forEach(k => {
                 if (k.startsWith('xrsports_cache_') && !k.includes('_v3_')) {
@@ -220,8 +230,14 @@
             });
         } catch(e) {}
 
+        // =======================================================================
+        // 🛡️ SISTEMA DE BLINDAGEM EXTREMA FRONTEND (ANTI-CURIOSO)
+        // =======================================================================
+        
+        // 1. Desativa Clique Direito em tudo
         document.addEventListener('contextmenu', event => event.preventDefault());
 
+        // 2. Trava F12, Inspecionar e Ver Código Fonte (Ctrl+U)
         document.onkeydown = function(e) {
             if (e.key === "F12" || e.keyCode === 123) return false;
             if (e.ctrlKey && e.shiftKey && (e.key === "I" || e.keyCode === 73)) return false;
@@ -230,14 +246,19 @@
             if (e.ctrlKey && (e.key === "U" || e.keyCode === 85)) return false;
         };
 
+        // 3. Sensor de Limpeza e Aviso
         setInterval(() => {
             console.clear();
             console.log("%c🛑 ACESSO NEGADO PELA XR SPORTS", "color: red; font-size: 25px; font-weight: bold; background: black; padding: 10px; border-radius: 5px;");
             console.log("%cEste ambiente é monitorado e protegido por Firewall.", "color: white; font-size: 14px; background: black; padding: 5px; margin-top: 5px;");
         }, 1500);
 
-        setInterval(function() { debugger; }, 100);
+        // 4. Armadilha Congelante (Trava a aba se tentar abrir scripts)
+        setInterval(function() {
+            debugger;
+        }, 100);
 
+        // 5. Sensor de Abertura do Painel (Redirecionamento Automático)
         const checkDevTools = () => {
             const isPanelOpen = window.outerWidth - window.innerWidth > 160 || window.outerHeight - window.innerHeight > 160;
             if (isPanelOpen) {
@@ -246,6 +267,7 @@
             }
         };
         setInterval(checkDevTools, 1000);
+        // =======================================================================
 
         const _0xShieldKeys = [
             atob("MzhiNTczYWU0YzNjYzEyZGNhZjljYTM2OTY3YjU3MDk="), 
@@ -258,9 +280,7 @@
         let indiceChave = 0;
         let API_KEY = _0xShieldKeys[indiceChave];
         const NUMERO_WHATSAPP = "5582993729095"; 
-        const COOLDOWN_MS = 60000; 
-        
-        let intervalBilhete = null; // Trava contra vazamento de memória do cronômetro
+        const COOLDOWN_MS = 60000;
 
         function permissaoParaChamarAPI() {
             const ultimoAcesso = localStorage.getItem('xrsports_firewall_timer');
@@ -284,6 +304,9 @@
             return false;
         }
 
+        // =======================================================================
+        // 💥 ANTI-CACHE ABSOLUTO APLICADO NO FETCH BLINDADO
+        // =======================================================================
         async function fetchBlindado(url, timeoutMs = 8000, maxRetries = 2) {
             for (let i = 0; i <= maxRetries; i++) {
                 try {
@@ -319,6 +342,7 @@
         let nomeLigaFoco = "🇧🇷 Brasileirão";
         let jogosCarregados = [];
         let carrinho = [];
+        
         let historicoBilhetes = JSON.parse(localStorage.getItem('xrsports_historico_links')) || [];
 
         let clicksAdmin = 0; let timerAdmin;
@@ -343,30 +367,114 @@
         }
         function esconderLoading() { document.getElementById('overlay-loading').style.display = 'none'; }
 
+        const fetchHeaders = { 'Cache-Control': 'no-cache, no-store, must-revalidate', 'Pragma': 'no-cache', 'Expires': '0' };
+
         async function salvarNaNuvem(dados) {
             try { dados.hash = btoa(`${dados.v}-${dados.o}-${dados.p}`); } catch(e) {} 
-            try { let req1 = await fetch("https://jsonblob.com/api/jsonBlob", { method: "POST", headers: { "Content-Type": "application/json", "Accept": "application/json" }, body: JSON.stringify(dados) }); if (req1.ok) { let loc = req1.headers.get("Location"); if (loc) { return "BLB-" + loc.split('/').pop(); } } } catch(e) {}
-            try { let req2 = await fetch("https://api.restful-api.dev/objects", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name: "XRSportsTicket", data: dados }) }); if (req2.ok) { let json = await req2.json(); return "RST-" + json.id; } } catch (e) {}
-            try { let req3 = await fetch("https://bytebin.lucko.me/post", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(dados) }); if (req3.ok) { let json = await req3.json(); return "BYT-" + json.key; } } catch (e) {}
-            try { let req4 = await fetch("https://api.pastes.dev/post", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(dados) }); if (req4.ok) { let json = await req4.json(); return "PST-" + json.key; } } catch (e) {}
+            
+            try {
+                let req1 = await fetch("https://jsonblob.com/api/jsonBlob", {
+                    method: "POST", headers: { "Content-Type": "application/json", "Accept": "application/json" },
+                    body: JSON.stringify(dados)
+                });
+                if (req1.ok) {
+                    let loc = req1.headers.get("Location");
+                    if (loc) { return "BLB-" + loc.split('/').pop(); }
+                }
+            } catch(e) {}
+
+            try {
+                let req2 = await fetch("https://api.restful-api.dev/objects", {
+                    method: "POST", headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ name: "XRSportsTicket", data: dados })
+                });
+                if (req2.ok) { let json = await req2.json(); return "RST-" + json.id; }
+            } catch (e) {}
+
+            try {
+                let req3 = await fetch("https://bytebin.lucko.me/post", {
+                    method: "POST", headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(dados)
+                });
+                if (req3.ok) { let json = await req3.json(); return "BYT-" + json.key; }
+            } catch (e) {}
+
+            try {
+                let req4 = await fetch("https://api.pastes.dev/post", {
+                    method: "POST", headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(dados)
+                });
+                if (req4.ok) { let json = await req4.json(); return "PST-" + json.key; }
+            } catch (e) {}
+
             return null;
         }
 
         async function lerDaNuvem(blobId) {
             if (!blobId) return null;
             let antiCache = `?_t=${new Date().getTime()}`;
-            if (blobId.startsWith("BYT-")) { let id = blobId.replace("BYT-", ""); try { let res = await fetch(`https://bytebin.lucko.me/${id}${antiCache}`, { method: 'GET', cache: 'no-store' }); if (res.ok) return await res.json(); } catch(e) {} }
-            if (blobId.startsWith("PST-")) { let id = blobId.replace("PST-", ""); try { let res = await fetch(`https://api.pastes.dev/${id}${antiCache}`, { method: 'GET', cache: 'no-store' }); if (res.ok) return await res.json(); } catch(e) {} }
-            if (blobId.startsWith("RST-")) { let id = blobId.replace("RST-", ""); try { let res = await fetch(`https://api.restful-api.dev/objects/${id}${antiCache}`, { method: 'GET', cache: 'no-store' }); if (res.ok) { let json = await res.json(); return json.data; } } catch(e) {} }
-            if (blobId.startsWith("BLB-")) { let id = blobId.replace("BLB-", ""); try { let res = await fetch(`https://jsonblob.com/api/jsonBlob/${id}${antiCache}`, { method: 'GET', cache: 'no-store' }); if(res.ok) return await res.json(); } catch(e) {} }
-            if (blobId.startsWith("OFF-")) { try { return JSON.parse(decodeURIComponent(atob(decodeURIComponent(blobId.replace("OFF-", ""))))); } catch(e) { return null; } }
+
+            if (blobId.startsWith("BYT-")) {
+                let id = blobId.replace("BYT-", "");
+                try { 
+                    let res = await fetch(`https://bytebin.lucko.me/${id}${antiCache}`, { method: 'GET', cache: 'no-store' }); 
+                    if (res.ok) return await res.json(); 
+                } catch(e) {}
+            }
+            if (blobId.startsWith("PST-")) {
+                let id = blobId.replace("PST-", "");
+                try { 
+                    let res = await fetch(`https://api.pastes.dev/${id}${antiCache}`, { method: 'GET', cache: 'no-store' }); 
+                    if (res.ok) return await res.json(); 
+                } catch(e) {}
+            }
+            if (blobId.startsWith("RST-")) {
+                let id = blobId.replace("RST-", "");
+                try { 
+                    let res = await fetch(`https://api.restful-api.dev/objects/${id}${antiCache}`, { method: 'GET', cache: 'no-store' }); 
+                    if (res.ok) { let json = await res.json(); return json.data; } 
+                } catch(e) {}
+            }
+            if (blobId.startsWith("BLB-")) {
+                let id = blobId.replace("BLB-", "");
+                try { 
+                    let res = await fetch(`https://jsonblob.com/api/jsonBlob/${id}${antiCache}`, { method: 'GET', cache: 'no-store' }); 
+                    if(res.ok) return await res.json(); 
+                } catch(e) {}
+            }
+            
+            if (blobId.startsWith("OFF-")) { 
+                try { return JSON.parse(decodeURIComponent(atob(decodeURIComponent(blobId.replace("OFF-", ""))))); } catch(e) { return null; } 
+            }
+
             return null;
         }
 
         async function atualizarNaNuvem(blobId, dados) {
-            if (blobId.startsWith("OFF-") || blobId.startsWith("BYT-") || blobId.startsWith("PST-")) return false; 
-            if (blobId.startsWith("BLB-")) { let id = blobId.replace("BLB-", ""); try { let res = await fetch(`https://jsonblob.com/api/jsonBlob/${id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json', "Accept": "application/json" }, body: JSON.stringify(dados) }); return res.ok ? blobId : false; } catch(e) { return false; } }
-            if (blobId.startsWith("RST-")) { let id = blobId.replace("RST-", ""); try { let res = await fetch(`https://api.restful-api.dev/objects/${id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name: "XRSportsTicket", data: dados }) }); return res.ok ? blobId : false; } catch(e) { return false; } }
+            if (blobId.startsWith("OFF-")) return false; 
+            
+            if (blobId.startsWith("BYT-") || blobId.startsWith("PST-")) {
+                return false;
+            }
+
+            if (blobId.startsWith("BLB-")) {
+                let id = blobId.replace("BLB-", "");
+                try { 
+                    let res = await fetch(`https://jsonblob.com/api/jsonBlob/${id}`, { 
+                        method: 'PUT', headers: { 'Content-Type': 'application/json', "Accept": "application/json" }, body: JSON.stringify(dados) 
+                    }); 
+                    return res.ok ? blobId : false; 
+                } catch(e) { return false; }
+            }
+            if (blobId.startsWith("RST-")) {
+                let id = blobId.replace("RST-", "");
+                try { 
+                    let res = await fetch(`https://api.restful-api.dev/objects/${id}`, { 
+                        method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name: "XRSportsTicket", data: dados }) 
+                    }); 
+                    return res.ok ? blobId : false; 
+                } catch(e) { return false; }
+            }
             return false;
         }
 
@@ -374,54 +482,112 @@
         function carregarCarrinho() { let salvo = localStorage.getItem('xrsports_carrinho'); if(salvo) carrinho = JSON.parse(salvo); }
 
         const bancoDeEscudos = {
-            "flamengo": "https://upload.wikimedia.org/wikipedia/commons/2/2e/Flamengo_braz_logo.svg", "palmeiras": "https://upload.wikimedia.org/wikipedia/commons/1/10/Palmeiras_logo.svg", "corinthians": "https://upload.wikimedia.org/wikipedia/pt/b/b4/Corinthians_simbolo.png",
-            "são paulo": "https://upload.wikimedia.org/wikipedia/commons/2/2b/S%C3%A3o_Paulo_Futebol_Clube.svg", "sao paulo": "https://upload.wikimedia.org/wikipedia/commons/2/2b/S%C3%A3o_Paulo_Futebol_Clube.svg", "fluminense": "https://upload.wikimedia.org/wikipedia/pt/a/a3/Fluminense_FC_escudo.png",
-            "botafogo": "https://upload.wikimedia.org/wikipedia/commons/c/cb/Escudo_Botafogo.svg", "vasco": "https://upload.wikimedia.org/wikipedia/pt/a/ac/CRVascodaGama.png", "vasco da gama": "https://upload.wikimedia.org/wikipedia/pt/a/ac/CRVascodaGama.png",
-            "cruzeiro": "https://upload.wikimedia.org/wikipedia/commons/9/90/Cruzeiro_Esporte_Clube_%28logo%29.svg", "atletico-mg": "https://upload.wikimedia.org/wikipedia/commons/5/5f/Atletico_mineiro_galo.png", "atlético-mg": "https://upload.wikimedia.org/wikipedia/commons/5/5f/Atletico_mineiro_galo.png",
-            "grêmio": "https://upload.wikimedia.org/wikipedia/commons/4/42/Gremio_logo.svg", "gremio": "https://upload.wikimedia.org/wikipedia/commons/4/42/Gremio_logo.svg", "internacional": "https://upload.wikimedia.org/wikipedia/commons/f/f1/Escudo_do_Sport_Club_Internacional.svg",
-            "athletico-pr": "https://upload.wikimedia.org/wikipedia/commons/b/b3/CA_Athletico_Paranaense.svg", "coritiba": "https://upload.wikimedia.org/wikipedia/commons/4/4d/Coritiba_FBC_%282011%29_-_Paran%C3%A1.svg", "bahia": "https://upload.wikimedia.org/wikipedia/pt/9/90/ECBahia.png",
-            "vitória": "https://upload.wikimedia.org/wikipedia/pt/5/51/EC_Vitoria_Escudo.png", "vitoria": "https://upload.wikimedia.org/wikipedia/pt/5/51/EC_Vitoria_Escudo.png", "fortaleza": "https://upload.wikimedia.org/wikipedia/commons/7/77/Fortaleza_Esporte_Clube_logo.svg",
-            "ceará": "https://upload.wikimedia.org/wikipedia/commons/3/38/Cear%C3%A1_Sporting_Club_logo.svg", "ceara": "https://upload.wikimedia.org/wikipedia/commons/3/38/Cear%C3%A1_Sporting_Club_logo.svg", "sport": "https://upload.wikimedia.org/wikipedia/pt/4/4c/Sport_Club_do_Recife.png",
-            "sport recife": "https://upload.wikimedia.org/wikipedia/pt/4/4c/Sport_Club_do_Recife.png", "crb": "https://upload.wikimedia.org/wikipedia/commons/6/64/CRB_logo.svg", "csa": "https://upload.wikimedia.org/wikipedia/pt/b/b8/Centro_Sportivo_Alagoano.png",
-            "santos": "https://upload.wikimedia.org/wikipedia/commons/3/35/Santos_logo.svg", "juventude": "https://upload.wikimedia.org/wikipedia/pt/f/fb/Esporte_Clube_Juventude_logo.png", "criciúma": "https://upload.wikimedia.org/wikipedia/commons/1/1a/Crici%C3%BAma_Esporte_Clube.svg",
-            "criciuma": "https://upload.wikimedia.org/wikipedia/commons/1/1a/Crici%C3%BAma_Esporte_Clube.svg", "bragantino": "https://upload.wikimedia.org/wikipedia/pt/thumb/d/d2/Red_Bull_Bragantino.svg/1200px-Red_Bull_Bragantino.svg.png", "red bull bragantino": "https://upload.wikimedia.org/wikipedia/pt/thumb/d/d2/Red_Bull_Bragantino.svg/1200px-Red_Bull_Bragantino.svg.png",
-            "goiás": "https://upload.wikimedia.org/wikipedia/commons/a/ac/Goias_Esporte_Clube_logo.svg", "goias": "https://upload.wikimedia.org/wikipedia/commons/a/ac/Goias_Esporte_Clube_logo.svg", "atlético-go": "https://upload.wikimedia.org/wikipedia/pt/1/12/Atletico_goianiense_2020.png", "atletico-go": "https://upload.wikimedia.org/wikipedia/pt/1/12/Atletico_goianiense_2020.png",
-            "real madrid": "https://upload.wikimedia.org/wikipedia/en/5/56/Real_Madrid_CF.svg", "barcelona": "https://upload.wikimedia.org/wikipedia/en/4/47/FC_Barcelona_%28crest%29.svg", "arsenal": "https://upload.wikimedia.org/wikipedia/en/5/53/Arsenal_FC.svg",
-            "manchester city": "https://upload.wikimedia.org/wikipedia/en/e/eb/Manchester_City_FC_badge.svg", "manchester united": "https://upload.wikimedia.org/wikipedia/en/7/7a/Manchester_United_FC_crest.svg", "liverpool": "https://upload.wikimedia.org/wikipedia/en/0/0c/Liverpool_FC.svg",
-            "chelsea": "https://upload.wikimedia.org/wikipedia/en/c/cc/Chelsea_FC.svg", "bayern munich": "https://upload.wikimedia.org/wikipedia/commons/1/1b/FC_Bayern_M%C3%BCnchen_logo_%282017%29.svg", "bayern": "https://upload.wikimedia.org/wikipedia/commons/1/1b/FC_Bayern_M%C3%BCnchen_logo_%282017%29.svg",
-            "psg": "https://upload.wikimedia.org/wikipedia/en/a/a7/Paris_Saint-Germain_F.C..svg", "paris saint-germain": "https://upload.wikimedia.org/wikipedia/en/a/a7/Paris_Saint-Germain_F.C..svg", "juventus": "https://upload.wikimedia.org/wikipedia/commons/b/bc/Juventus_FC_-_escudo.svg",
-            "ac milan": "https://upload.wikimedia.org/wikipedia/commons/d/d0/Logo_of_AC_Milan.svg", "inter": "https://upload.wikimedia.org/wikipedia/commons/0/05/FC_Internazionale_Milano_2021.svg", "inter milan": "https://upload.wikimedia.org/wikipedia/commons/0/05/FC_Internazionale_Milano_2021.svg",
-            "atletico madrid": "https://upload.wikimedia.org/wikipedia/en/f/f4/Atletico_Madrid_2017_logo.svg", "borussia dortmund": "https://upload.wikimedia.org/wikipedia/commons/6/67/Borussia_Dortmund_logo.svg", "napoli": "https://upload.wikimedia.org/wikipedia/commons/2/28/S.S.C._Napoli_logo.svg"
+            "flamengo": "https://upload.wikimedia.org/wikipedia/commons/2/2e/Flamengo_braz_logo.svg",
+            "palmeiras": "https://upload.wikimedia.org/wikipedia/commons/1/10/Palmeiras_logo.svg",
+            "corinthians": "https://upload.wikimedia.org/wikipedia/pt/b/b4/Corinthians_simbolo.png",
+            "são paulo": "https://upload.wikimedia.org/wikipedia/commons/2/2b/S%C3%A3o_Paulo_Futebol_Clube.svg",
+            "sao paulo": "https://upload.wikimedia.org/wikipedia/commons/2/2b/S%C3%A3o_Paulo_Futebol_Clube.svg",
+            "fluminense": "https://upload.wikimedia.org/wikipedia/pt/a/a3/Fluminense_FC_escudo.png",
+            "botafogo": "https://upload.wikimedia.org/wikipedia/commons/c/cb/Escudo_Botafogo.svg",
+            "vasco": "https://upload.wikimedia.org/wikipedia/pt/a/ac/CRVascodaGama.png",
+            "vasco da gama": "https://upload.wikimedia.org/wikipedia/pt/a/ac/CRVascodaGama.png",
+            "cruzeiro": "https://upload.wikimedia.org/wikipedia/commons/9/90/Cruzeiro_Esporte_Clube_%28logo%29.svg",
+            "atletico-mg": "https://upload.wikimedia.org/wikipedia/commons/5/5f/Atletico_mineiro_galo.png",
+            "atlético-mg": "https://upload.wikimedia.org/wikipedia/commons/5/5f/Atletico_mineiro_galo.png",
+            "grêmio": "https://upload.wikimedia.org/wikipedia/commons/4/42/Gremio_logo.svg",
+            "gremio": "https://upload.wikimedia.org/wikipedia/commons/4/42/Gremio_logo.svg",
+            "internacional": "https://upload.wikimedia.org/wikipedia/commons/f/f1/Escudo_do_Sport_Club_Internacional.svg",
+            "athletico-pr": "https://upload.wikimedia.org/wikipedia/commons/b/b3/CA_Athletico_Paranaense.svg",
+            "coritiba": "https://upload.wikimedia.org/wikipedia/commons/4/4d/Coritiba_FBC_%282011%29_-_Paran%C3%A1.svg",
+            "bahia": "https://upload.wikimedia.org/wikipedia/pt/9/90/ECBahia.png",
+            "vitória": "https://upload.wikimedia.org/wikipedia/pt/5/51/EC_Vitoria_Escudo.png",
+            "vitoria": "https://upload.wikimedia.org/wikipedia/pt/5/51/EC_Vitoria_Escudo.png",
+            "fortaleza": "https://upload.wikimedia.org/wikipedia/commons/7/77/Fortaleza_Esporte_Clube_logo.svg",
+            "ceará": "https://upload.wikimedia.org/wikipedia/commons/3/38/Cear%C3%A1_Sporting_Club_logo.svg",
+            "ceara": "https://upload.wikimedia.org/wikipedia/commons/3/38/Cear%C3%A1_Sporting_Club_logo.svg",
+            "sport": "https://upload.wikimedia.org/wikipedia/pt/4/4c/Sport_Club_do_Recife.png",
+            "sport recife": "https://upload.wikimedia.org/wikipedia/pt/4/4c/Sport_Club_do_Recife.png",
+            "crb": "https://upload.wikimedia.org/wikipedia/commons/6/64/CRB_logo.svg",
+            "csa": "https://upload.wikimedia.org/wikipedia/pt/b/b8/Centro_Sportivo_Alagoano.png",
+            "santos": "https://upload.wikimedia.org/wikipedia/commons/3/35/Santos_logo.svg",
+            "juventude": "https://upload.wikimedia.org/wikipedia/pt/f/fb/Esporte_Clube_Juventude_logo.png",
+            "criciúma": "https://upload.wikimedia.org/wikipedia/commons/1/1a/Crici%C3%BAma_Esporte_Clube.svg",
+            "criciuma": "https://upload.wikimedia.org/wikipedia/commons/1/1a/Crici%C3%BAma_Esporte_Clube.svg",
+            "bragantino": "https://upload.wikimedia.org/wikipedia/pt/thumb/d/d2/Red_Bull_Bragantino.svg/1200px-Red_Bull_Bragantino.svg.png",
+            "red bull bragantino": "https://upload.wikimedia.org/wikipedia/pt/thumb/d/d2/Red_Bull_Bragantino.svg/1200px-Red_Bull_Bragantino.svg.png",
+            "goiás": "https://upload.wikimedia.org/wikipedia/commons/a/ac/Goias_Esporte_Clube_logo.svg",
+            "goias": "https://upload.wikimedia.org/wikipedia/commons/a/ac/Goias_Esporte_Clube_logo.svg",
+            "atlético-go": "https://upload.wikimedia.org/wikipedia/pt/1/12/Atletico_goianiense_2020.png",
+            "atletico-go": "https://upload.wikimedia.org/wikipedia/pt/1/12/Atletico_goianiense_2020.png",
+            
+            "real madrid": "https://upload.wikimedia.org/wikipedia/en/5/56/Real_Madrid_CF.svg",
+            "barcelona": "https://upload.wikimedia.org/wikipedia/en/4/47/FC_Barcelona_%28crest%29.svg",
+            "arsenal": "https://upload.wikimedia.org/wikipedia/en/5/53/Arsenal_FC.svg",
+            "manchester city": "https://upload.wikimedia.org/wikipedia/en/e/eb/Manchester_City_FC_badge.svg",
+            "manchester united": "https://upload.wikimedia.org/wikipedia/en/7/7a/Manchester_United_FC_crest.svg",
+            "liverpool": "https://upload.wikimedia.org/wikipedia/en/0/0c/Liverpool_FC.svg",
+            "chelsea": "https://upload.wikimedia.org/wikipedia/en/c/cc/Chelsea_FC.svg",
+            "bayern munich": "https://upload.wikimedia.org/wikipedia/commons/1/1b/FC_Bayern_M%C3%BCnchen_logo_%282017%29.svg",
+            "bayern": "https://upload.wikimedia.org/wikipedia/commons/1/1b/FC_Bayern_M%C3%BCnchen_logo_%282017%29.svg",
+            "psg": "https://upload.wikimedia.org/wikipedia/en/a/a7/Paris_Saint-Germain_F.C..svg",
+            "paris saint-germain": "https://upload.wikimedia.org/wikipedia/en/a/a7/Paris_Saint-Germain_F.C..svg",
+            "juventus": "https://upload.wikimedia.org/wikipedia/commons/b/bc/Juventus_FC_-_escudo.svg",
+            "ac milan": "https://upload.wikimedia.org/wikipedia/commons/d/d0/Logo_of_AC_Milan.svg",
+            "inter": "https://upload.wikimedia.org/wikipedia/commons/0/05/FC_Internazionale_Milano_2021.svg",
+            "inter milan": "https://upload.wikimedia.org/wikipedia/commons/0/05/FC_Internazionale_Milano_2021.svg",
+            "atletico madrid": "https://upload.wikimedia.org/wikipedia/en/f/f4/Atletico_Madrid_2017_logo.svg",
+            "borussia dortmund": "https://upload.wikimedia.org/wikipedia/commons/6/67/Borussia_Dortmund_logo.svg",
+            "napoli": "https://upload.wikimedia.org/wikipedia/commons/2/28/S.S.C._Napoli_logo.svg"
         };
         let cacheEscudos = JSON.parse(localStorage.getItem('xrsports_escudos')) || {}; cacheEscudos = { ...cacheEscudos, ...bancoDeEscudos };
 
         function normalizarNomeParaBusca(nome) {
             let n = nome.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/-rj|-sp|-mg|-rs|-pr|-sc|-ba|-ce|-go|-pe/g, "").trim();
-            const tradutor = { "crb": "clube de regatas brasil", "vasco": "vasco da gama", "atletico-mg": "atletico mineiro", "sport recife": "sport club do recife", "athletico-pr": "athletico paranaense", "atletico-go": "atletico goianiense", "red bull bragantino": "bragantino" };
+            const tradutor = { 
+                "crb": "clube de regatas brasil", 
+                "vasco": "vasco da gama", 
+                "atletico-mg": "atletico mineiro", 
+                "sport recife": "sport club do recife",
+                "athletico-pr": "athletico paranaense",
+                "atletico-go": "atletico goianiense",
+                "red bull bragantino": "bragantino"
+            };
             if (tradutor[n]) return tradutor[n]; return n.replace(/\bfc\b/g, "").trim();
         }
 
         function desenharEscudo(nome) {
             let n = nome.trim().toLowerCase();
-            if (cacheEscudos[n]) { return `<div class="escudo-container"><img src="${cacheEscudos[n]}" class="escudo-img"></div>`; }
+            if (cacheEscudos[n]) {
+                return `<div class="escudo-container"><img src="${cacheEscudos[n]}" class="escudo-img"></div>`;
+            }
             let letra = normalizarNomeParaBusca(nome).substring(0, 1).toUpperCase();
-            let cores = ["#ef4444", "#3b82f6", "#10b981", "#f59e0b", "#8b5cf6", "#ec4899"]; let num = 0; 
-            for (let i = 0; i < nome.length; i++) num += nome.charCodeAt(i); let cor = cores[num % cores.length];
+            let cores = ["#ef4444", "#3b82f6", "#10b981", "#f59e0b", "#8b5cf6", "#ec4899"];
+            let num = 0; 
+            for (let i = 0; i < nome.length; i++) num += nome.charCodeAt(i);
+            let cor = cores[num % cores.length];
             return `<div class="escudo-container escudo-dinamico" data-time="${nome}"><div class="escudo-letra" style="background:${cor}">${letra}</div></div>`;
         }
 
         async function carregarEscudosDinamicos() {
-            let escudosFaltando = document.querySelectorAll('.escudo-dinamico'); let timesParaBuscar = new Set();
+            let escudosFaltando = document.querySelectorAll('.escudo-dinamico');
+            let timesParaBuscar = new Set();
             escudosFaltando.forEach(el => timesParaBuscar.add(el.getAttribute('data-time')));
+
             timesParaBuscar.forEach(async (nomeOriginal) => {
-                let nKey = nomeOriginal.trim().toLowerCase(); let nomeBusca = normalizarNomeParaBusca(nomeOriginal);
+                let nKey = nomeOriginal.trim().toLowerCase();
+                let nomeBusca = normalizarNomeParaBusca(nomeOriginal);
+
                 try {
                     let res = await fetch(`https://www.thesportsdb.com/api/v1/json/3/searchteams.php?t=${encodeURIComponent(nomeBusca)}`);
                     let data = await res.json();
                     if (data.teams && data.teams[0] && data.teams[0].strTeamBadge) {
-                        let imgUrl = data.teams[0].strTeamBadge; cacheEscudos[nKey] = imgUrl;
+                        let imgUrl = data.teams[0].strTeamBadge;
+                        cacheEscudos[nKey] = imgUrl;
                         localStorage.setItem('xrsports_escudos', JSON.stringify(cacheEscudos));
-                        document.querySelectorAll(`.escudo-dinamico[data-time="${nomeOriginal}"]`).forEach(container => { container.innerHTML = `<img src="${imgUrl}" class="escudo-img" style="animation: fadeIn 0.5s ease-in;">`; container.classList.remove('escudo-dinamico'); });
+                        document.querySelectorAll(`.escudo-dinamico[data-time="${nomeOriginal}"]`).forEach(container => {
+                            container.innerHTML = `<img src="${imgUrl}" class="escudo-img" style="animation: fadeIn 0.5s ease-in;">`;
+                            container.classList.remove('escudo-dinamico'); 
+                        });
                     }
                 } catch (erro) {}
             });
@@ -429,16 +595,25 @@
 
         window.onload = function() {
             const urlParams = new URLSearchParams(window.location.search);
-            if(urlParams.has('b')) { document.getElementById('tela-principal').style.display = 'none'; montarBilheteDigital(urlParams.get('b')); } 
-            else { carregarCarrinho(); buscarJogosNaAPI(); }
+            if(urlParams.has('b')) {
+                document.getElementById('tela-principal').style.display = 'none';
+                montarBilheteDigital(urlParams.get('b'));
+            } else { carregarCarrinho(); buscarJogosNaAPI(); }
         };
 
         function clienteBuscarBilhete() {
             let linkInformado = document.getElementById('input-busca-cliente').value.trim();
             if(!linkInformado) { mostrarToast("Cole o link do seu bilhete primeiro!", "erro"); return; }
-            let partes = linkInformado.split('?b='); let blobId = partes.length > 1 ? partes[1] : linkInformado; blobId = blobId.split('&')[0].trim();
-            let baseUrl = window.location.href.split('?')[0]; let novaUrl = baseUrl + "?b=" + blobId;
-            if (window.location.href === novaUrl) { window.location.reload(true); } else { window.location.href = novaUrl; }
+            
+            let partes = linkInformado.split('?b=');
+            let blobId = partes.length > 1 ? partes[1] : linkInformado;
+            blobId = blobId.split('&')[0].trim();
+            
+            let baseUrl = window.location.href.split('?')[0];
+            let novaUrl = baseUrl + "?b=" + blobId;
+            
+            if (window.location.href === novaUrl) { window.location.reload(true); } 
+            else { window.location.href = novaUrl; }
         }
 
         function abrirLogin() { document.getElementById('tela-principal').style.display = 'none'; document.getElementById('tela-login').style.display = 'block'; }
@@ -448,22 +623,30 @@
             if(document.getElementById('user').value === 'RickAlves76' && document.getElementById('pass').value === 'admin') {
                 document.getElementById('tela-login').style.display = 'none'; document.getElementById('tela-admin').style.display = 'block';
                 document.getElementById('user').value = ''; document.getElementById('pass').value = ''; 
-                mostrarToast("Acesso Liberado, Chefe!"); carregarHistoricoAdmin(); 
+                mostrarToast("Acesso Liberado, Chefe!");
+                carregarHistoricoAdmin(); 
             } else { mostrarToast("Usuário ou senha incorretos!", "erro"); }
         }
 
         async function carregarHistoricoAdmin() {
             let container = document.getElementById('lista-historico-admin');
-            if (historicoBilhetes.length === 0) { container.innerHTML = '<p style="color: var(--texto-secundario); font-size: 13px; text-align: center;">Nenhum bilhete salvo no seu painel.</p>'; return; }
+            if (historicoBilhetes.length === 0) {
+                container.innerHTML = '<p style="color: var(--texto-secundario); font-size: 13px; text-align: center;">Nenhum bilhete salvo no seu painel.</p>';
+                return;
+            }
             container.innerHTML = '<div style="text-align:center"><div class="spinner" style="margin:0 auto"></div><p style="font-size:12px; margin-top:10px;">Buscando status ao vivo...</p></div>';
             
             let html = "";
             for (let i = 0; i < historicoBilhetes.length; i++) {
-                let id = historicoBilhetes[i]; let b = await lerDaNuvem(id);
+                let id = historicoBilhetes[i];
+                let b = await lerDaNuvem(id);
                 if (b) {
                     let retorno = (b.v * b.o).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
                     let stsTxt = "⏳ Aguardando"; let corB = "var(--amarelo)";
-                    let isValidHash = b.hash === btoa(`${b.v}-${b.o}-${b.p}`); let iconeAlerta = isValidHash ? "" : " ⚠️ ALERTA DE FRAUDE";
+                    
+                    let isValidHash = b.hash === btoa(`${b.v}-${b.o}-${b.p}`);
+                    let iconeAlerta = isValidHash ? "" : " ⚠️ ALERTA DE FRAUDE";
+
                     if(b.s === 1) { stsTxt = "✅ Ativo"; corB = "var(--neon)"; } 
                     if(b.s === 2) { stsTxt = "🟢 GREEN"; corB = "var(--neon)"; }
                     if(b.s === 3) { stsTxt = "🔴 RED"; corB = "var(--danger)"; }
@@ -494,71 +677,139 @@
             try {
                 let dados = await lerDaNuvem(blobId);
                 if (dados) {
-                    dados.s = novoStatus; let isSuccess = false; let linkMudouParaNovo = false;
-                    if (!blobId.startsWith("OFF-")) { isSuccess = await atualizarNaNuvem(blobId, dados); }
+                    dados.s = novoStatus;
+                    let isSuccess = false;
+                    let linkMudouParaNovo = false;
+
+                    // 1. Tenta atualizar no mesmo link primeiro
+                    if (!blobId.startsWith("OFF-")) {
+                        isSuccess = await atualizarNaNuvem(blobId, dados);
+                    }
+
+                    // 2. Se o servidor rejeitar a edição, cria um NOVO LINK com o resultado
                     if (!isSuccess) {
                         let novoBlobId = await salvarNaNuvem(dados);
-                        if (novoBlobId) { blobId = novoBlobId; isSuccess = true; linkMudouParaNovo = true; }
+                        if (novoBlobId) {
+                            blobId = novoBlobId;
+                            isSuccess = true;
+                            linkMudouParaNovo = true;
+                        }
                     }
 
                     if (isSuccess) {
+                        // 3. Atualiza o painel histórico do Admin com o link correto
                         let idx = historicoBilhetes.indexOf(blobIdOriginal);
-                        if (idx > -1) { historicoBilhetes[idx] = blobId; localStorage.setItem('xrsports_historico_links', JSON.stringify(historicoBilhetes)); }
+                        if (idx > -1) {
+                            historicoBilhetes[idx] = blobId;
+                            localStorage.setItem('xrsports_historico_links', JSON.stringify(historicoBilhetes));
+                        }
+
                         carregarHistoricoAdmin();
+
+                        // 4. Se o link mudou, AVISA o cambista para mandar pro cliente
                         if (linkMudouParaNovo) {
                             let linkFinalValidado = window.location.href.split('?')[0] + "?b=" + blobId;
                             try { navigator.clipboard.writeText(linkFinalValidado); } catch(e){}
-                            document.getElementById('modal-blindagem-texto').innerHTML = "O servidor bloqueou a edição do link antigo. O sistema gerou um <strong style='color:var(--neon);'>NOVO LINK</strong> com o resultado!<br><br>Ele já foi <b>Copiado para o seu celular!</b><br>Envie pro cliente para ele ver o bilhete atualizado.";
-                            document.getElementById('btn-modal-blindagem').onclick = function() { document.getElementById('modal-blindagem').style.display = 'none'; window.open(linkFinalValidado, '_blank'); };
+
+                            document.getElementById('modal-blindagem-texto').innerHTML = "O servidor bloqueou a edição do link antigo. O sistema gerou um <strong style='color:var(--neon);'>NOVO LINK</strong> com o resultado (Green/Red/Cancelado)!<br><br>Ele já foi <b>Copiado para o seu celular!</b><br>Envie pro cliente para ele ver o bilhete atualizado.";
+
+                            document.getElementById('btn-modal-blindagem').onclick = function() {
+                                document.getElementById('modal-blindagem').style.display = 'none';
+                                window.open(linkFinalValidado, '_blank'); // Abre o link novo para o admin ver
+                            };
                             document.getElementById('modal-blindagem').style.display = 'flex';
-                        } else { mostrarToast("Status atualizado com sucesso no mesmo link!"); }
-                    } else { mostrarToast("Falha na atualização. Verifique a internet.", "erro"); }
-                } else { mostrarToast("Bilhete não encontrado no banco de dados.", "erro"); }
-            } catch(e) { mostrarToast("Erro ao processar dados da aposta.", "erro"); }
+                        } else {
+                            mostrarToast("Status atualizado com sucesso no mesmo link!");
+                        }
+                    } else { 
+                        mostrarToast("Falha na atualização. Verifique a internet.", "erro"); 
+                    }
+                } else {
+                    mostrarToast("Bilhete não encontrado no banco de dados.", "erro");
+                }
+            } catch(e) {
+                mostrarToast("Erro ao processar dados da aposta.", "erro");
+            }
             esconderLoading();
         }
 
         async function gerarBilheteValidado() {
             let codigoLink = document.getElementById('codigo-recebido').value.trim();
             let nomeClienteAdmin = document.getElementById('nome-cliente-admin').value.trim();
+
             if(!codigoLink) { mostrarToast("Cole o link do cliente primeiro!", "erro"); return; }
             if(!nomeClienteAdmin) { mostrarToast("Digite o nome do cliente antes de validar!", "erro"); return; }
             
-            let partes = codigoLink.split('?b='); let blobId = partes.length > 1 ? partes[1] : codigoLink; blobId = blobId.split('&')[0].trim(); let blobIdOriginal = blobId;
+            let partes = codigoLink.split('?b=');
+            let blobId = partes.length > 1 ? partes[1] : codigoLink;
+            blobId = blobId.split('&')[0].trim();
+            let blobIdOriginal = blobId;
+            
             mostrarLoading("Validando...");
             
             try {
                 let dados = await lerDaNuvem(blobId);
+                
                 if(dados) {
-                    dados.s = 1; dados.n = nomeClienteAdmin; let agora = new Date(); 
+                    dados.s = 1; 
+                    dados.n = nomeClienteAdmin; 
+                    let agora = new Date(); 
                     dados.d = agora.toLocaleDateString('pt-BR') + ' às ' + agora.toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'});
-                    let isSuccess = false; let linkMudouParaNovo = false; 
-                    if (!blobId.startsWith("OFF-")) { isSuccess = await atualizarNaNuvem(blobId, dados); }
+                    
+                    let isSuccess = false;
+                    let linkMudouParaNovo = false; 
+
+                    if (!blobId.startsWith("OFF-")) {
+                        isSuccess = await atualizarNaNuvem(blobId, dados);
+                    }
+
                     if (!isSuccess) {
                         let novoBlobId = await salvarNaNuvem(dados);
-                        if (novoBlobId) { blobId = novoBlobId; isSuccess = true; linkMudouParaNovo = true; }
+                        if (novoBlobId) {
+                            blobId = novoBlobId; 
+                            isSuccess = true;
+                            linkMudouParaNovo = true;
+                        }
                     }
 
                     if(isSuccess) {
                         let idx = historicoBilhetes.indexOf(blobIdOriginal);
-                        if (idx > -1) { historicoBilhetes[idx] = blobId; } else if (!historicoBilhetes.includes(blobId)) { historicoBilhetes.unshift(blobId); }
+                        if (idx > -1) {
+                            historicoBilhetes[idx] = blobId;
+                        } else if (!historicoBilhetes.includes(blobId)) {
+                            historicoBilhetes.unshift(blobId);
+                        }
                         localStorage.setItem('xrsports_historico_links', JSON.stringify(historicoBilhetes));
-                        document.getElementById('codigo-recebido').value = ''; document.getElementById('nome-cliente-admin').value = '';
+                        
+                        document.getElementById('codigo-recebido').value = '';
+                        document.getElementById('nome-cliente-admin').value = '';
+                        
                         let linkFinalValidado = window.location.href.split('?')[0] + "?b=" + blobId;
+
                         carregarHistoricoAdmin();
 
                         if (linkMudouParaNovo) {
                             try { navigator.clipboard.writeText(linkFinalValidado); } catch(e){}
                             document.getElementById('modal-blindagem-texto').innerHTML = "O sistema gerou um <strong style='color:var(--neon);'>NOVO LINK</strong> já validado!<br><br>Ele já foi <b>Copiado para o seu celular!</b><br>Mande pro cliente, pois o link antigo dele não vai mudar.";
-                            document.getElementById('btn-modal-blindagem').onclick = function() { window.location.href = linkFinalValidado; };
+                            
+                            document.getElementById('btn-modal-blindagem').onclick = function() {
+                                window.location.href = linkFinalValidado;
+                            };
                             document.getElementById('modal-blindagem').style.display = 'flex';
                         } else {
                             mostrarToast("✅ Bilhete Validado na Nuvem!");
                             setTimeout(() => { window.location.href = linkFinalValidado; }, 1500);
                         }
-                    } else { mostrarToast("Erro Crítico. O servidor e o modo offline falharam.", "erro"); }
-                } else { mostrarToast("Bilhete não encontrado ou corrompido!", "erro"); }
-            } catch (e) { mostrarToast("Erro no processamento.", "erro"); }
+                    } else { 
+                        mostrarToast("Erro Crítico. O servidor e o modo offline falharam.", "erro"); 
+                    }
+                } else { 
+                    mostrarToast("Bilhete não encontrado ou corrompido!", "erro"); 
+                }
+            } catch (e) {
+                mostrarToast("Erro no processamento.", "erro");
+            }
+            
             esconderLoading();
         }
 
@@ -581,36 +832,32 @@
                 let linkAcompanhar = baseUrl + "?b=" + blobId;
                 let textoZap = `⚡ *XR SPORTS - NOVA APOSTA* ⚡%0A📌 PIN: *${codigoPIN}*%0A💰 Valor: *R$ ${valorDep.toFixed(2)}*%0A%0A👉 *Valide meu bilhete no link abaixo:*%0A${linkAcompanhar}`;
                 window.location.href = `https://wa.me/${NUMERO_WHATSAPP}?text=${textoZap}`;
-            } else { mostrarToast("Os servidores estão sobrecarregados no momento. Tente novamente em alguns segundos.", "erro"); }
+            } else { 
+                mostrarToast("Os servidores estão sobrecarregados no momento. Tente novamente em alguns segundos.", "erro"); 
+            }
         }
 
         // =======================================================================
-        // 💥 O NOVO MOTOR DE BUSCA DE PLACARES NO BILHETE (REESCRITO + SEGURO)
+        // 💥 O NOVO MOTOR DE BUSCA DE PLACARES NO BILHETE DIGITAL (TOTALMENTE REESCRITO + RELÓGIO INTELIGENTE)
         // =======================================================================
         async function buscarPlacaresBilhete(ligas, dadosBilhete, blobId) {
-            
-            if (dadosBilhete.s === 4) {
-                dadosBilhete.j.forEach((jogo, index) => {
-                    let divPlacar = document.getElementById(`placar-bilhete-${jogo.idJogo}-${index}`);
-                    if (divPlacar) divPlacar.innerHTML = `<div style="color:var(--texto-secundario); font-size: 11px; font-weight: bold; margin-top: 8px; border-top: 1px dashed var(--borda); padding-top: 5px; text-align: center;">⚪ APOSTA CANCELADA</div>`;
-                });
-                return;
-            }
-
             let placaresMap = {};
             let apiEsgotada = false;
 
             const tentarBuscar = async (liga) => {
                 let urlPura = `https://api.the-odds-api.com/v4/sports/${liga}/scores/?apiKey=${API_KEY}&daysFrom=3`;
                 let req = await fetchBlindado(urlPura, 5000, 1);
+                
                 if (req.status === 401 || req.status === 429) {
                     if (trocarChaveAPI()) return await tentarBuscar(liga);
-                    apiEsgotada = true; return null;
+                    apiEsgotada = true;
+                    return null;
                 }
                 let res = await req.json();
                 if(res.message) {
                     if (trocarChaveAPI()) return await tentarBuscar(liga);
-                    apiEsgotada = true; return null;
+                    apiEsgotada = true;
+                    return null;
                 }
                 return res;
             };
@@ -626,24 +873,24 @@
             let teveAlteracao = false;
 
             dadosBilhete.j.forEach((jogo, index) => {
+                if (jogo.placarFinal) return; 
+
                 let divPlacar = document.getElementById(`placar-bilhete-${jogo.idJogo}-${index}`);
-                if (!divPlacar) return; 
-                
-                if (jogo.placarFinal) {
-                    divPlacar.innerHTML = `<div style="color:var(--texto-secundario); font-size: 12px; font-weight: bold; margin-top: 8px; border-top: 1px dashed var(--borda); padding-top: 5px; text-align: center;">${jogo.placarFinal}</div>`;
-                    return; 
-                }
+                if (!divPlacar) return;
 
                 if (apiEsgotada && Object.keys(placaresMap).length === 0) {
-                    divPlacar.innerHTML = `<div style="color:var(--texto-secundario); font-size: 11px; margin-top: 8px; border-top: 1px dashed var(--borda); padding-top: 5px; text-align: center;">⚠️ Aguardando sincronização da API...</div>`;
+                    divPlacar.innerHTML = `<div style="color:var(--texto-secundario); font-size: 11px; margin-top: 8px; border-top: 1px dashed var(--borda); padding-top: 5px; text-align: center;">⚠️ Aguardando sincronização...</div>`;
                     return;
                 }
 
                 let s = placaresMap[jogo.idJogo];
+                
+                // FALLBACK INTELIGENTE: Se a API mudou o ID do jogo, ele procura pelos times!
                 if (!s) {
                     let partes = jogo.tituloJogo.split(' x ');
                     let casa = partes[0] ? partes[0].trim().toLowerCase() : "";
                     let fora = partes[1] ? partes[1].trim().toLowerCase() : "";
+                    
                     s = Object.values(placaresMap).find(x => {
                         let h = x.home_team ? x.home_team.toLowerCase() : "";
                         let a = x.away_team ? x.away_team.toLowerCase() : "";
@@ -652,20 +899,26 @@
                 }
 
                 if(s) {
-                    let placarCasa = "?"; let placarFora = "?"; let temPlacar = false;
+                    let placarCasa = "0"; let placarFora = "0";
+                    let temPlacar = false;
                     
                     if(s.scores && s.scores.length > 0) {
                         let objCasa = s.scores.find(x => x.name === s.home_team);
                         let objFora = s.scores.find(x => x.name === s.away_team);
-                        placarCasa = (objCasa && objCasa.score !== null) ? objCasa.score : "?";
-                        placarFora = (objFora && objFora.score !== null) ? objFora.score : "?";
-                        if (placarCasa !== "?" && placarFora !== "?") temPlacar = true;
+                        placarCasa = (objCasa && objCasa.score !== null) ? objCasa.score : "0";
+                        placarFora = (objFora && objFora.score !== null) ? objFora.score : "0";
+                        temPlacar = true;
                     }
 
+                    // 💥 O RELÓGIO INTELIGENTE
                     let horaDoJogo = new Date(s.commence_time);
-                    let minutosPassados = Math.floor((new Date() - horaDoJogo) / 60000);
-                    
-                    let isFinalizadoForcado = s.completed || (minutosPassados > 120);
+                    let minutosPassados = (new Date() - horaDoJogo) / 60000;
+
+                    if (!temPlacar && minutosPassados > 0) {
+                        temPlacar = true;
+                    }
+
+                    let isFinalizadoForcado = s.completed || (minutosPassados > 135);
 
                     if(isFinalizadoForcado) {
                         let placarFinalTxt = temPlacar ? `${placarCasa} - ${placarFora}` : "Encerrado";
@@ -676,11 +929,10 @@
                         if (dadosBilhete.s === 2 || dadosBilhete.s === 3) {
                             divPlacar.innerHTML = `<div style="color:var(--texto-secundario); font-size: 12px; font-weight: bold; margin-top: 8px; border-top: 1px dashed var(--borda); padding-top: 5px; text-align: center;">🏁 JOGO FINALIZADO: ${placarCasa} - ${placarFora}</div>`;
                         } else {
-                            if (minutosPassados >= 48 && minutosPassados <= 63) { 
+                            if (minutosPassados >= 46 && minutosPassados <= 60) {
                                 divPlacar.innerHTML = `<div style="color:var(--amarelo); font-size: 13px; font-weight: 900; margin-top: 8px; border-top: 1px dashed var(--borda); padding-top: 5px; text-align: center; animation: piscar 1.5s infinite;">⏸️ INTERVALO: ${placarCasa} - ${placarFora}</div>`;
                             } else {
-                                let tempoStr = (minutosPassados > 0 && minutosPassados <= 120) ? ` ${minutosPassados}'` : "";
-                                divPlacar.innerHTML = `<div style="color:var(--live); font-size: 13px; font-weight: 900; margin-top: 8px; border-top: 1px dashed var(--borda); padding-top: 5px; text-align: center; animation: piscar 1.5s infinite;">🔴 AO VIVO${tempoStr}: ${placarCasa} - ${placarFora}</div>`;
+                                divPlacar.innerHTML = `<div style="color:var(--live); font-size: 13px; font-weight: 900; margin-top: 8px; border-top: 1px dashed var(--borda); padding-top: 5px; text-align: center; animation: piscar 1.5s infinite;">🔴 AO VIVO: ${placarCasa} - ${placarFora}</div>`;
                             }
                         }
                     } else {
@@ -703,7 +955,9 @@
                 }
             });
 
-            if (teveAlteracao && blobId && !blobId.startsWith("OFF-")) { atualizarNaNuvem(blobId, dadosBilhete); }
+            if (teveAlteracao && blobId && !blobId.startsWith("OFF-")) {
+                atualizarNaNuvem(blobId, dadosBilhete);
+            }
         }
 
         async function montarBilheteDigital(blobId) {
@@ -761,11 +1015,9 @@
             document.getElementById('tela-digital').style.opacity = '1';
             esconderLoading();
 
-            if (intervalBilhete) clearInterval(intervalBilhete);
-
             if(ligasBilhete.length > 0 && precisaBuscarAoVivo && dados.s >= 0 && dados.s <= 3) {
                 buscarPlacaresBilhete(ligasBilhete, dados, blobId);
-                intervalBilhete = setInterval(() => buscarPlacaresBilhete(ligasBilhete, dados, blobId), 90000);
+                setInterval(() => buscarPlacaresBilhete(ligasBilhete, dados, blobId), 60000);
             }
         }
 
@@ -812,6 +1064,7 @@
                 const diffMinutos = (new Date().getTime() - dadosCache.tempo) / 60000;
 
                 let temLive = dadosCache.jogos.some(j => j.isLive);
+                
                 let limiteCache = temLive ? 1 : 15;
 
                 if (diffMinutos < limiteCache) {
@@ -827,7 +1080,7 @@
 
             const tentarBuscar = async () => {
                 const linkOdds = `https://api.the-odds-api.com/v4/sports/${ligaFoco}/odds/?apiKey=${API_KEY}&regions=eu,us&markets=h2h,totals`;
-                const linkScores = `https://api.the-odds-api.com/v4/sports/${ligaFoco}/scores/?apiKey=${API_KEY}`;
+                const linkScores = `https://api.the-odds-api.com/v4/sports/${ligaFoco}/scores/?apiKey=${API_KEY}&daysFrom=3`;
 
                 try {
                     const [reqOdds, reqScores] = await Promise.all([
@@ -854,11 +1107,12 @@
                     if(Array.isArray(resScores)) { resScores.forEach(s => { mapaScores[s.id] = s; }); }
 
                     resOdds.forEach(jogo => {
-                        let horaDoJogo = new Date(jogo.commence_time); let dadosScore = mapaScores[jogo.id];
+                        let horaDoJogo = new Date(jogo.commence_time); let dadosScore = mapaScores[jogo.id] || Object.values(mapaScores).find(s => (s.home_team === jogo.home_team || s.away_team === jogo.away_team));
                         if ((dadosScore && dadosScore.completed) || horaDoJogo < horaLimiteSumir || !jogo.bookmakers || jogo.bookmakers.length === 0) return; 
 
                         let placarC = "", placarF = ""; let isIntervalo = false; let isLive = horaDoJogo <= horaAtual;
                         let minutosCorridos = isLive ? Math.floor((horaAtual - horaDoJogo) / 60000) : 0;
+                        
                         let placarCInt = 0, placarFInt = 0;
                         
                         if(isLive) {
@@ -873,7 +1127,7 @@
                             placarFInt = parseInt(placarF) || 0;
                         }
                         
-                        if (minutosCorridos >= 48 && minutosCorridos <= 63) { isIntervalo = true; } 
+                        if (minutosCorridos >= 46 && minutosCorridos <= 60) { isIntervalo = true; }
 
                         let totalGols = placarCInt + placarFInt; 
                         let isBtts = placarCInt > 0 && placarFInt > 0;
@@ -898,6 +1152,7 @@
                             });
                         });
 
+                        // PLANO B (FALLBACK): Criação de Odds Sintéticas
                         if(oddC > 0 && oddE > 0 && oddF > 0) {
                             if (oddM25 === 0) { oddM25 = 2.05; oddN25 = 1.75; }
                             if (oddM15 === 0) { oddM15 = 1.35; oddN15 = 3.10; }
@@ -919,6 +1174,7 @@
                             oddBttsNao = 1.85 * 0.88; 
                         }
                         
+                        // BTTS HT
                         if (oddBttsSim > 0) {
                             let pBttsHT_Y = Math.min(0.35, (1 / oddBttsSim) * 0.35); 
                             oddBttsHTSim = (1 / pBttsHT_Y) * 0.88;
@@ -959,7 +1215,7 @@
                             oddF_M25 = (1/pF_M25)*0.85; oddF_N25 = (1/(1-pF_M25))*0.85;
                         }
 
-                        if (isLive && minutosCorridos > 0 && minutosCorridos <= 120) {
+                        if (isLive && minutosCorridos > 0 && minutosCorridos <= 100) {
                             let f = Math.max(0.02, (90 - minutosCorridos) / 90); 
                             let fUnder = Math.pow(f, 1.5); 
                             let fatorAumento = 1 + (1 - f) * 2.5;
@@ -1004,7 +1260,7 @@
                             if (placarFInt >= 1) { oddF_M05 = 0; oddF_N05 = 0; } else { oddF_N05 = 1.01 + (oddF_N05 - 1.01) * fUnder; oddF_M05 *= fatorAumento; }
                             if (placarFInt >= 2) { oddF_M15 = 0; oddF_N15 = 0; } else { oddF_N15 = 1.01 + (oddF_N15 - 1.01) * fUnder; oddF_M15 *= fatorAumento; }
                             if (placarFInt >= 3) { oddF_M25 = 0; oddF_N25 = 0; } else { oddF_N25 = 1.01 + (oddF_N25 - 1.01) * fUnder; oddF_M25 *= fatorAumento; }
-                        } else if (isLive && minutosCorridos > 120) {
+                        } else if (isLive && minutosCorridos > 100) {
                             oddC=0; oddE=0; oddF=0; oddM15=0; oddN15=0; oddM25=0; oddN25=0; oddBttsSim=0; oddBttsNao=0; oddCrtM25=0; oddCrtN25=0;
                             oddM05_HT=0; oddN05_HT=0; oddM15_HT=0; oddN15_HT=0; oddBttsHTSim=0; oddBttsHTNao=0;
                             oddC_M05=0; oddC_N05=0; oddC_M15=0; oddC_N15=0; oddC_M25=0; oddC_N25=0;
@@ -1125,8 +1381,7 @@
                 let safeCasa = j.casa.replace(/'/g, " ");
                 let safeFora = j.fora.replace(/'/g, " ");
 
-                let tempoStr = (j.minutosCorridos > 0 && j.minutosCorridos <= 120) ? ` ${j.minutosCorridos}'` : "";
-                let badgeDaHora = j.isLive ? (j.isIntervalo ? `<div class="badge-horario badge-intervalo">⏸️ INTERVALO</div>` : `<div class="badge-horario badge-aovivo">🔴 AO VIVO${tempoStr}</div>`) : `<div class="badge-horario">📅 ${j.dataVisual}</div>`;
+                let badgeDaHora = j.isLive ? (j.isIntervalo ? `<div class="badge-horario badge-intervalo">⏸️ INTERVALO</div>` : `<div class="badge-horario badge-aovivo">🔴 AO VIVO</div>`) : `<div class="badge-horario">📅 ${j.dataVisual}</div>`;
                 let centroPlacar = `<div class="vs-txt">X</div>`; 
                 if (j.isLive && j.placarC !== "" && j.placarF !== "") { centroPlacar = `<div class="placar-live">${j.placarC} - ${j.placarF}</div>`; }
                 
@@ -1463,7 +1718,11 @@
         function abrirBilhete() { document.getElementById('modal-bilhete').style.display = 'flex'; }
         function fecharBilhete() { document.getElementById('modal-bilhete').style.display = 'none'; }
 
+        // =======================================================================
+        // ATUALIZAÇÃO AUTOMÁTICA DA TELA PRINCIPAL (PLACAR AO VIVO)
+        // =======================================================================
         setInterval(() => {
+            // Só atualiza sozinho se estiver na tela de apostas e houver jogos ao vivo carregados
             if (document.getElementById('tela-principal').style.display !== 'none') {
                 let temJogoAoVivo = jogosCarregados.some(j => j.isLive);
                 if (temJogoAoVivo) {
@@ -1474,7 +1733,7 @@
                     }
                 }
             }
-        }, 65000); 
+        }, 65000); // Verifica a cada 65 segundos
 
     </script>
 </body>
