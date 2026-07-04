@@ -303,12 +303,28 @@
             return false;
         }
 
+        // =======================================================================
+        // 💥 ANTI-CACHE ABSOLUTO APLICADO NO FETCH BLINDADO
+        // =======================================================================
         async function fetchBlindado(url, timeoutMs = 8000, maxRetries = 2) {
             for (let i = 0; i <= maxRetries; i++) {
                 try {
                     const controller = new AbortController();
                     const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
-                    const response = await fetch(url, { signal: controller.signal });
+                    
+                    // Adiciona um carimbo de tempo na URL para o celular nunca reaproveitar a resposta velha
+                    let urlLimpa = url + (url.includes('?') ? '&' : '?') + '_t=' + new Date().getTime();
+
+                    const response = await fetch(urlLimpa, { 
+                        signal: controller.signal,
+                        cache: 'no-store', // Força a buscar na rede
+                        headers: {
+                            'Cache-Control': 'no-cache, no-store, must-revalidate',
+                            'Pragma': 'no-cache',
+                            'Expires': '0'
+                        }
+                    });
+                    
                     clearTimeout(timeoutId);
                     
                     if (!response.ok && response.status !== 401 && response.status !== 429) {
@@ -948,7 +964,10 @@
             document.getElementById('tela-digital').style.opacity = '1';
             esconderLoading();
 
-            if(ligasBilhete.length > 0 && precisaBuscarAoVivo && dados.s >= 1 && dados.s <= 3) {
+            // =======================================================================
+            // 💥 CORREÇÃO: LIBERA BUSCA DE PLACAR MESMO SE O STATUS FOR 0 (PENDENTE)
+            // =======================================================================
+            if(ligasBilhete.length > 0 && precisaBuscarAoVivo && dados.s >= 0 && dados.s <= 3) {
                 buscarPlacaresBilhete(ligasBilhete, dados, blobId);
                 setInterval(() => buscarPlacaresBilhete(ligasBilhete, dados, blobId), 60000);
             }
