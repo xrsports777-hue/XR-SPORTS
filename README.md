@@ -356,53 +356,48 @@
         async function salvarNaNuvem(dados) {
             try { dados.hash = btoa(`${dados.v}-${dados.o}-${dados.p}`); } catch(e) {} 
             
-            // TENTATIVA 1: ByteBin (Servidor ultra-rápido, sem frescura de bloqueio e garante link curto)
             try {
-                let req1 = await fetch("https://bytebin.lucko.me/post", {
-                    method: "POST", headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(dados)
-                });
-                if (req1.ok) { let json = await req1.json(); return "BYT-" + json.key; }
-            } catch (e) {}
-
-            // TENTATIVA 2: Pastes.dev (Outro servidor blindado e rápido para links curtos)
-            try {
-                let req2 = await fetch("https://api.pastes.dev/post", {
-                    method: "POST", headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(dados)
-                });
-                if (req2.ok) { let json = await req2.json(); return "PST-" + json.key; }
-            } catch (e) {}
-
-            // TENTATIVA 3: Restful API (O seu original)
-            try {
-                let req3 = await fetch("https://api.restful-api.dev/objects", {
-                    method: "POST", headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ name: "XRSportsTicket", data: dados })
-                });
-                if (req3.ok) { let json = await req3.json(); return "RST-" + json.id; }
-            } catch (e) {}
-
-            // TENTATIVA 4: JSONBlob (Último recurso de link curto)
-            try {
-                let req4 = await fetch("https://jsonblob.com/api/jsonBlob", {
+                let req1 = await fetch("https://jsonblob.com/api/jsonBlob", {
                     method: "POST", headers: { "Content-Type": "application/json", "Accept": "application/json" },
                     body: JSON.stringify(dados)
                 });
-                if (req4.ok) {
-                    let loc = req4.headers.get("Location");
+                if (req1.ok) {
+                    let loc = req1.headers.get("Location");
                     if (loc) { return "BLB-" + loc.split('/').pop(); }
                 }
             } catch(e) {}
 
-            return null; // O cliente só vê erro se ele estiver literalmente sem internet
+            try {
+                let req2 = await fetch("https://api.restful-api.dev/objects", {
+                    method: "POST", headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ name: "XRSportsTicket", data: dados })
+                });
+                if (req2.ok) { let json = await req2.json(); return "RST-" + json.id; }
+            } catch (e) {}
+
+            try {
+                let req3 = await fetch("https://bytebin.lucko.me/post", {
+                    method: "POST", headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(dados)
+                });
+                if (req3.ok) { let json = await req3.json(); return "BYT-" + json.key; }
+            } catch (e) {}
+
+            try {
+                let req4 = await fetch("https://api.pastes.dev/post", {
+                    method: "POST", headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(dados)
+                });
+                if (req4.ok) { let json = await req4.json(); return "PST-" + json.key; }
+            } catch (e) {}
+
+            return null;
         }
 
         async function lerDaNuvem(blobId) {
             if (!blobId) return null;
             let antiCache = `?_t=${new Date().getTime()}`;
 
-            // LER DO BYTEBIN
             if (blobId.startsWith("BYT-")) {
                 let id = blobId.replace("BYT-", "");
                 try { 
@@ -410,7 +405,6 @@
                     if (res.ok) return await res.json(); 
                 } catch(e) {}
             }
-            // LER DO PASTES.DEV
             if (blobId.startsWith("PST-")) {
                 let id = blobId.replace("PST-", "");
                 try { 
@@ -418,7 +412,6 @@
                     if (res.ok) return await res.json(); 
                 } catch(e) {}
             }
-            // LER DO RESTFUL
             if (blobId.startsWith("RST-")) {
                 let id = blobId.replace("RST-", "");
                 try { 
@@ -426,7 +419,6 @@
                     if (res.ok) { let json = await res.json(); return json.data; } 
                 } catch(e) {}
             }
-            // LER DO JSONBLOB
             if (blobId.startsWith("BLB-")) {
                 let id = blobId.replace("BLB-", "");
                 try { 
@@ -435,7 +427,6 @@
                 } catch(e) {}
             }
             
-            // Mantém suporte para links antigos já gerados não quebrarem
             if (blobId.startsWith("OFF-")) { 
                 try { return JSON.parse(decodeURIComponent(atob(decodeURIComponent(blobId.replace("OFF-", ""))))); } catch(e) { return null; } 
             }
@@ -446,8 +437,6 @@
         async function atualizarNaNuvem(blobId, dados) {
             if (blobId.startsWith("OFF-")) return false; 
             
-            // ByteBin e Pastes não permitem edição de link, então o sistema retorna false
-            // e o seu painel de Cambista vai gerar automaticamente um link curto NOVO validado (tudo já tá programado e funciona perfeitamente)
             if (blobId.startsWith("BYT-") || blobId.startsWith("PST-")) {
                 return false;
             }
@@ -964,6 +953,19 @@
             mostrarToast("Buscando dados mais recentes...");
         }
 
+        // =======================================================================
+        // 🔒 SISTEMA DE CLAMP ROBUSTO (AJUSTE FINO DE MARGEM DA BANCA)
+        // Substitui o antigo '* 0.85' linear que vazava odds altas
+        // =======================================================================
+        const clampOdd = (val) => {
+            if (!val || val <= 1.01) return 0;
+            // Curva Exponencial: Corta odds muito altas de forma agressiva (protege contra zebras superpagas)
+            // mas preserva melhor as odds baixas (para manter o jogo atrativo no favorito).
+            let novaOdd = Math.pow(val, 0.92) * 0.95;
+            // Teto máximo de odd permitida em aposta única e chão de 1.02
+            return Math.min(30.00, Math.max(1.02, novaOdd));
+        };
+
         async function buscarJogosNaAPI() {
             let painelAviso = document.getElementById('status-msg');
             document.getElementById('container-jogos').innerHTML = "";
@@ -1064,61 +1066,78 @@
                             });
                         });
 
-                        // PLANO B (FALLBACK): Se a API não mandar a linha de 2.5 ou 1.5, o sistema CRIA uma odd base
+                        // PLANO B (FALLBACK): Criação de Odds Sintéticas
                         if(oddC > 0 && oddE > 0 && oddF > 0) {
                             if (oddM25 === 0) { oddM25 = 2.05; oddN25 = 1.75; }
                             if (oddM15 === 0) { oddM15 = 1.35; oddN15 = 3.10; }
                         }
 
-                        if (oddM25 > 0 && oddM15 === 0) { let pM25 = 1 / oddM25; let pM15 = Math.min(0.95, pM25 * 1.35); oddM15 = (1 / pM15) * 0.92; oddN15 = (1 / (1-pM15)) * 0.92; }
+                        if (oddM25 > 0 && oddM15 === 0) { 
+                            let pM25 = 1 / oddM25; 
+                            let pM15 = Math.min(0.95, pM25 * 1.35); 
+                            oddM15 = (1 / pM15) * 0.88; 
+                            oddN15 = (1 / (1-pM15)) * 0.88; 
+                        }
                         
-                        if (oddM25 > 0) { let pBttsSim = Math.min(0.88, (1 / oddM25) * 1.05); oddBttsSim = (1 / pBttsSim) * 0.92; oddBttsNao = (1 / (1 - pBttsSim)) * 0.92; } else if (oddC > 0) { oddBttsSim = 1.85 * 0.92; oddBttsNao = 1.85 * 0.92; }
+                        if (oddM25 > 0) { 
+                            let pBttsSim = Math.min(0.88, (1 / oddM25) * 1.05); 
+                            oddBttsSim = (1 / pBttsSim) * 0.88; 
+                            oddBttsNao = (1 / (1 - pBttsSim)) * 0.88; 
+                        } else if (oddC > 0) { 
+                            oddBttsSim = 1.85 * 0.88; 
+                            oddBttsNao = 1.85 * 0.88; 
+                        }
                         
                         // BTTS HT
                         if (oddBttsSim > 0) {
                             let pBttsHT_Y = Math.min(0.35, (1 / oddBttsSim) * 0.35); 
-                            oddBttsHTSim = (1 / pBttsHT_Y) * 0.92;
-                            oddBttsHTNao = (1 / (1 - pBttsHT_Y)) * 0.92;
+                            oddBttsHTSim = (1 / pBttsHT_Y) * 0.88;
+                            oddBttsHTNao = (1 / (1 - pBttsHT_Y)) * 0.88;
                         }
 
                         if (oddM25 > 0) {
                             let pM25 = 1 / oddM25;
                             let pM05HT = Math.min(0.85, pM25 * 1.5);
                             let pM15HT = Math.max(0.15, pM25 * 0.6);
-                            oddM05_HT = (1 / pM05HT) * 0.92;
-                            oddN05_HT = (1 / (1 - pM05HT)) * 0.92;
-                            oddM15_HT = (1 / pM15HT) * 0.92;
-                            oddN15_HT = (1 / (1 - pM15HT)) * 0.92;
+                            oddM05_HT = (1 / pM05HT) * 0.88;
+                            oddN05_HT = (1 / (1 - pM05HT)) * 0.88;
+                            oddM15_HT = (1 / pM15HT) * 0.88;
+                            oddN15_HT = (1 / (1 - pM15HT)) * 0.88;
                         }
                         
                         let probM25Cartoes = 0.70 + (Math.random() * 0.1); 
-                        oddCrtM25 = (1 / probM25Cartoes) * 0.92; oddCrtN25 = (1 / (1 - probM25Cartoes)) * 0.92;
+                        oddCrtM25 = (1 / probM25Cartoes) * 0.85; oddCrtN25 = (1 / (1 - probM25Cartoes)) * 0.85;
 
+                        // ==========================================
+                        // AJUSTE CORRIGIDO: MERCADO DE GOLS POR TIME
+                        // ==========================================
                         if(oddC > 0 && oddF > 0 && oddM25 > 0) {
                             let pC = 1/oddC; let pF = 1/oddF; let pTot = pC + pF;
                             let pesoC = pC/pTot; let pesoF = pF/pTot;
                             
-                            let pC_M05 = Math.min(0.92, 0.40 + (pesoC * 0.5));
-                            let pC_M15 = Math.min(0.75, 0.15 + (pesoC * 0.4));
-                            let pC_M25 = Math.min(0.40, 0.05 + (pesoC * 0.25));
+                            // Ajuste rígido na probabilidade para não inflar a cotação
+                            let pC_M05 = Math.min(0.92, 0.50 + (pesoC * 0.6));
+                            let pC_M15 = Math.min(0.75, 0.10 + (pesoC * 0.8));
+                            let pC_M25 = Math.min(0.45, 0.02 + (pesoC * 0.4));
                             
-                            let pF_M05 = Math.min(0.92, 0.40 + (pesoF * 0.5));
-                            let pF_M15 = Math.min(0.75, 0.15 + (pesoF * 0.4));
-                            let pF_M25 = Math.min(0.40, 0.05 + (pesoF * 0.25));
+                            let pF_M05 = Math.min(0.92, 0.50 + (pesoF * 0.6));
+                            let pF_M15 = Math.min(0.75, 0.10 + (pesoF * 0.8));
+                            let pF_M25 = Math.min(0.45, 0.02 + (pesoF * 0.4));
 
-                            oddC_M05 = (1/pC_M05)*0.92; oddC_N05 = (1/(1-pC_M05))*0.92;
-                            oddC_M15 = (1/pC_M15)*0.92; oddC_N15 = (1/(1-pC_M15))*0.92;
-                            oddC_M25 = (1/pC_M25)*0.92; oddC_N25 = (1/(1-pC_M25))*0.92;
+                            oddC_M05 = (1/pC_M05)*0.85; oddC_N05 = (1/(1-pC_M05))*0.85;
+                            oddC_M15 = (1/pC_M15)*0.85; oddC_N15 = (1/(1-pC_M15))*0.85;
+                            oddC_M25 = (1/pC_M25)*0.85; oddC_N25 = (1/(1-pC_M25))*0.85;
                             
-                            oddF_M05 = (1/pF_M05)*0.92; oddF_N05 = (1/(1-pF_M05))*0.92;
-                            oddF_M15 = (1/pF_M15)*0.92; oddF_N15 = (1/(1-pF_M15))*0.92;
-                            oddF_M25 = (1/pF_M25)*0.92; oddF_N25 = (1/(1-pF_M25))*0.92;
+                            oddF_M05 = (1/pF_M05)*0.85; oddF_N05 = (1/(1-pF_M05))*0.85;
+                            oddF_M15 = (1/pF_M15)*0.85; oddF_N15 = (1/(1-pF_M15))*0.85;
+                            oddF_M25 = (1/pF_M25)*0.85; oddF_N25 = (1/(1-pF_M25))*0.85;
                         }
 
                         if (isLive && minutosCorridos > 0 && minutosCorridos <= 100) {
                             let f = Math.max(0.02, (90 - minutosCorridos) / 90); 
                             let fUnder = Math.pow(f, 1.5); 
-                            let fatorAumento = 1 + (1 - f) * 3;
+                            // Fator de aumento reduzido (max 2.5x em vez de 4x) para blindar a banca no final do jogo
+                            let fatorAumento = 1 + (1 - f) * 2.5;
 
                             if (placarCInt > placarFInt) { 
                                 oddC = 1.01 + (oddC - 1.01) * fUnder; 
@@ -1169,44 +1188,52 @@
                             oddVTG_CM25=0; oddVTG_EM25=0; oddVTG_FM25=0; oddVTG_CN25=0; oddVTG_EN25=0; oddVTG_FN25=0;
                         }
 
+                        // ==========================================
+                        // BASE MATH DOS MERCADOS ALTERNATIVOS
+                        // ==========================================
                         if(oddC > 0 && oddE > 0 && oddF > 0) {
                             let probC = 1 / oddC, probE = 1 / oddE, probF = 1 / oddF;
-                            odd1X = (1 / (probC + probE)) * 0.92; odd12 = (1 / (probC + probF)) * 0.92; oddX2 = (1 / (probF + probE)) * 0.92;
-                            oddDnbCasa = (1 / (probC / (probC + probF))) * 0.92; oddDnbFora = (1 / (probF / (probC + probF))) * 0.92;
+                            odd1X = (1 / (probC + probE)) * 0.88; odd12 = (1 / (probC + probF)) * 0.88; oddX2 = (1 / (probF + probE)) * 0.88;
+                            oddDnbCasa = (1 / (probC / (probC + probF))) * 0.88; oddDnbFora = (1 / (probF / (probC + probF))) * 0.88;
+                            
+                            // Correção de Multiplicadores HT (Mais precisos para a realidade do 1º Tempo)
                             if(minutosCorridos <= 45) { 
-                                oddC_HT = oddC * 1.15; oddE_HT = oddE * 0.85; oddF_HT = oddF * 1.15; 
+                                oddC_HT = oddC < 2.0 ? oddC * 1.40 : oddC * 1.10; 
+                                oddF_HT = oddF < 2.0 ? oddF * 1.40 : oddF * 1.10; 
+                                oddE_HT = oddE < 3.0 ? oddE * 0.85 : oddE * 0.75; 
+                                
                                 let probC_HT = 1 / oddC_HT, probE_HT = 1 / oddE_HT, probF_HT = 1 / oddF_HT;
-                                odd1X_HT = (1 / (probC_HT + probE_HT)) * 0.92;
-                                odd12_HT = (1 / (probC_HT + probF_HT)) * 0.92;
-                                oddX2_HT = (1 / (probF_HT + probE_HT)) * 0.92;
+                                odd1X_HT = (1 / (probC_HT + probE_HT)) * 0.88;
+                                odd12_HT = (1 / (probC_HT + probF_HT)) * 0.88;
+                                oddX2_HT = (1 / (probF_HT + probE_HT)) * 0.88;
                             }
 
+                            // Vencedor e Ambas Marcam (Margem Rígida de 0.80)
                             if(oddBttsSim > 0 && oddBttsNao > 0) {
                                 let probBttsY = 1 / oddBttsSim, probBttsN = 1 / oddBttsNao;
-                                oddVam_CS = (1 / (probC * probBttsY)) * 0.88;
-                                oddVam_ES = (1 / (probE * probBttsY)) * 0.88;
-                                oddVam_FS = (1 / (probF * probBttsY)) * 0.88;
+                                oddVam_CS = (1 / (probC * probBttsY)) * 0.80;
+                                oddVam_ES = (1 / (probE * probBttsY)) * 0.80;
+                                oddVam_FS = (1 / (probF * probBttsY)) * 0.80;
                                 
-                                oddVam_CN = (1 / (probC * probBttsN)) * 0.88;
-                                oddVam_EN = (1 / (probE * probBttsN)) * 0.88; 
-                                oddVam_FN = (1 / (probF * probBttsN)) * 0.88;
+                                oddVam_CN = (1 / (probC * probBttsN)) * 0.80;
+                                oddVam_EN = (1 / (probE * probBttsN)) * 0.80; 
+                                oddVam_FN = (1 / (probF * probBttsN)) * 0.80;
                             }
 
+                            // Vencedor e Mais/Menos de 2.5 (Margem Rígida de 0.80)
                             if(oddM25 > 0 && oddN25 > 0) {
                                 let probM25 = 1 / oddM25, probN25 = 1 / oddN25;
-                                oddVTG_CM25 = (1 / (probC * probM25)) * 0.88;
-                                oddVTG_EM25 = (1 / (probE * probM25)) * 0.88;
-                                oddVTG_FM25 = (1 / (probF * probM25)) * 0.88;
+                                oddVTG_CM25 = (1 / (probC * probM25)) * 0.80;
+                                oddVTG_EM25 = (1 / (probE * probM25)) * 0.80;
+                                oddVTG_FM25 = (1 / (probF * probM25)) * 0.80;
                                 
-                                oddVTG_CN25 = (1 / (probC * probN25)) * 0.88;
-                                oddVTG_EN25 = (1 / (probE * probN25)) * 0.88;
-                                oddVTG_FN25 = (1 / (probF * probN25)) * 0.88;
+                                oddVTG_CN25 = (1 / (probC * probN25)) * 0.80;
+                                oddVTG_EN25 = (1 / (probE * probN25)) * 0.80;
+                                oddVTG_FN25 = (1 / (probF * probN25)) * 0.80;
                             }
                         }
 
-                        const MARGEM_CASA = 0.85; 
-                        const clampOdd = (val) => val > 0 ? Math.min(50.00, Math.max(1.01, val * MARGEM_CASA)) : 0;
-
+                        // Aplica a Blindagem Exponencial em todas as Odds
                         odd1X = clampOdd(odd1X); odd12 = clampOdd(odd12); oddX2 = clampOdd(oddX2);
                         odd1X_HT = clampOdd(odd1X_HT); odd12_HT = clampOdd(odd12_HT); oddX2_HT = clampOdd(oddX2_HT);
                         oddDnbCasa = clampOdd(oddDnbCasa); oddDnbFora = clampOdd(oddDnbFora);
@@ -1442,7 +1469,6 @@
             let temVTGNesteJogo = selecoesNesteJogo.some(c => c.tipoOpcao.startsWith('VTG'));
             let outrasOpcoesNesteJogoVTG = selecoesNesteJogo.filter(c => !c.tipoOpcao.startsWith('VTG'));
 
-            // === REGRA: AMBAS MARCAM (1º TEMPO) ===
             let isOpcBTTSHT = ['BTTSHTY', 'BTTSHTN'].includes(tipoOpcao);
             let temBTTSHTNesteJogo = selecoesNesteJogo.some(c => ['BTTSHTY', 'BTTSHTN'].includes(c.tipoOpcao));
             let outrasOpcoesNesteJogoBTTSHT = selecoesNesteJogo.filter(c => !['BTTSHTY', 'BTTSHTN'].includes(c.tipoOpcao));
@@ -1459,7 +1485,6 @@
                     return;
                 }
 
-                // === REGRA: VENCEDOR E TOTAL DE GOLS ===
                 if (isOpcVTG && outrasOpcoesNesteJogoVTG.length > 0) {
                     if(navigator.vibrate) navigator.vibrate(200);
                     mostrarToast("⚠️ Regra da Banca:<br>Vencedor / Total de Gols não pode ser combinado com outros mercados no mesmo jogo!", "erro");
@@ -1471,7 +1496,6 @@
                     return;
                 }
 
-                // === REGRA: VENCEDOR E AMBOS MARCAM ===
                 if (isOpcVAM && outrasOpcoesNesteJogoVAM.length > 0) {
                     if(navigator.vibrate) navigator.vibrate(200);
                     mostrarToast("⚠️ Regra da Banca:<br>Vencedor / Ambos Marcam não pode ser combinado com outros mercados no mesmo jogo!", "erro");
